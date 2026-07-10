@@ -3,230 +3,262 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Portfolio Optimizer v2</title>
+<title>Portfolio Optimizer</title>
 <style>
 :root{
- --bg:#07111f;--panel:#0f1b2d;--panel2:#14263d;--line:#28405f;--text:#eef5ff;
- --muted:#8fa4bf;--accent:#2ea8ff;--green:#35d18a;--yellow:#f4c34f;--red:#ff6b78;
+  --bg:#07111f;--panel:#0f1b2d;--panel2:#14263d;--line:#28405f;--text:#eef5ff;
+  --muted:#8fa4bf;--accent:#2ea8ff;--green:#35d18a;--yellow:#f4c34f;--red:#ff6b78;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:14px system-ui,-apple-system,Segoe UI,sans-serif}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font:14px system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
 button,input,select{font:inherit}
 button{cursor:pointer}
-.app{display:grid;grid-template-columns:225px 1fr;min-height:100vh}
-.sidebar{padding:20px;background:#091522;border-right:1px solid var(--line);position:sticky;top:0;height:100vh}
-.brand{font-size:20px;font-weight:800}.sub{color:var(--muted);font-size:12px;margin:4px 0 20px}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.sidebar{background:#091522;border-right:1px solid var(--line);padding:20px;position:sticky;top:0;height:100vh}
+.brand{font-size:20px;font-weight:800}.subtitle{font-size:12px;color:var(--muted);margin:4px 0 22px}
 .nav{width:100%;text-align:left;padding:11px 12px;border:0;border-radius:9px;background:transparent;color:var(--muted);margin:4px 0}
 .nav.active,.nav:hover{background:var(--panel2);color:var(--text)}
 .main{padding:18px;overflow:auto}
-.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
-.top h1{font-size:22px;margin:0}.top p{margin:4px 0 0;color:var(--muted)}
+.topbar{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.topbar h1{font-size:22px;margin:0}.topbar p{color:var(--muted);margin:4px 0 0}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:9px 12px;border-radius:9px}
 .btn.primary{background:var(--accent);border-color:var(--accent);font-weight:700}
-.btn.green{background:#173d2c;border-color:#2b7e56}.btn.danger{background:#3b1820;border-color:#73313e}
-.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:14px 0}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
-.kpi small{color:var(--muted);text-transform:uppercase}.kpi b{display:block;font-size:23px;margin-top:8px}
+.btn.green{background:#173d2c;border-color:#2b7e56}.btn.danger{background:#3b1820;border-color:#73313e}.btn.light{background:#fff;color:#17202b;border-color:#ccd6e2}
 .view{display:none}.view.active{display:block}
-.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,.8fr);gap:14px}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi small{color:var(--muted);text-transform:uppercase;letter-spacing:.04em}.kpi b{display:block;font-size:23px;margin-top:8px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,.8fr);gap:14px}
 .stack{display:grid;gap:14px}
-.sectionHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.sectionHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
 .sectionHead h2{font-size:15px;margin:0}.sectionHead span{font-size:11px;color:var(--muted)}
 .tableWrap{overflow:auto}
 table{width:100%;border-collapse:collapse;font-size:12px}
 th,td{padding:9px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:left}
 th{color:var(--muted)}
-td input,.field,select{background:#091727;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px}
-td input{width:76px}
 .tag{display:inline-block;padding:3px 7px;border-radius:999px;background:#183550;color:#b8e3ff;font-size:10px}
-.groupHeader{background:#0b1727;color:#8fd3ff;font-weight:700;font-size:12px}
-.weightBar{width:90px;height:8px;background:#081320;border-radius:99px;display:inline-block;overflow:hidden;margin-right:6px}
+.groupRow{background:#0b1727;color:#8fd3ff;font-weight:700}
+.weightBar{width:88px;height:8px;background:#081320;border-radius:99px;overflow:hidden;display:inline-block;margin-right:6px}
 .weightBar i{display:block;height:100%;background:var(--accent)}
-.chart{width:100%;height:300px;background:#091727;border-radius:9px}
+.chart{width:100%;height:360px;background:#091727;border-radius:9px;display:block}
 .controls{display:grid;gap:10px}
 .control{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px}
 .control label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
 .control input[type=range]{width:100%}
-.compare{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.field{width:100%;background:#091727;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px}
+.compareGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .mini{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px}
-.mini span{color:var(--muted);font-size:11px}.mini b{display:block;font-size:18px;margin-top:5px}
-.good{color:var(--green)}.bad{color:var(--red)}
-.advisor,.history{color:var(--muted);font-size:12px;line-height:1.5}
-.assetTotals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.assetTotal{padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
-.assetTotal b{display:block;font-size:18px}
+.mini span{display:block;color:var(--muted);font-size:11px}.mini b{display:block;font-size:18px;margin-top:5px}
+.good{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--yellow)}
+.note,.history{font-size:12px;line-height:1.5;color:var(--muted)}
+.simCards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.simCard{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:12px}
+.simCard h3{margin:0 0 8px}.simCard .meta{color:var(--muted);font-size:11px;margin-bottom:8px}
+.simCard .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.simCard .metrics div{background:#0b1727;border-radius:7px;padding:7px}.simCard .metrics small{display:block;color:var(--muted)}
+.barList{display:grid;gap:8px}.barRow{display:grid;grid-template-columns:140px 1fr 58px;gap:8px;align-items:center}.barTrack{height:10px;background:#081320;border-radius:99px;overflow:hidden}.barTrack i{display:block;height:100%;background:var(--accent)}
+.sensitivity td.deltaPos{color:var(--green)}.sensitivity td.deltaNeg{color:var(--red)}
+.frontierLegend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:12px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
 .modal{display:none;position:fixed;inset:0;background:#000b;align-items:center;justify-content:center;padding:20px;z-index:50}
 .modal.open{display:flex}
-.modalBox{width:min(1100px,96vw);max-height:92vh;overflow:auto;background:#f7f9fc;color:#17202b;border-radius:14px;box-shadow:0 30px 80px #0008}
+.modalBox{width:min(1120px,96vw);max-height:94vh;overflow:auto;background:#f7f9fc;color:#17202b;border-radius:14px;box-shadow:0 30px 80px #0008}
 .modalTop{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid #dbe3ed}
 .modalTop h2{margin:0;font-size:22px}.closeX{font-size:25px;border:0;background:transparent}
-.profileTabs{display:flex;gap:10px;padding:16px 20px;border-bottom:1px solid #dbe3ed;flex-wrap:wrap}
-.profileTab{border:1px solid #3c82f6;color:#2866c7;background:white;padding:8px 12px;border-radius:999px}
-.profileTab.active{background:#3da95d;color:white;border-color:#3da95d}
-.simGrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,.7fr)}
-.simLeft{padding:16px 20px;border-right:1px solid #dbe3ed}
-.simRight{padding:16px 20px}
-.totalBox{padding:14px;border:1px solid #dbe3ed;border-radius:9px;background:white;margin-bottom:14px}
-.progress{height:10px;background:#e7edf5;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:#39a64f}
-.simGroup{margin-bottom:14px;background:white;border:1px solid #dbe3ed;border-radius:10px;overflow:hidden}
-.simGroupHead{display:flex;justify-content:space-between;padding:12px 14px;background:#eef2f7;font-weight:700;color:#1475d1}
-.simRow{display:grid;grid-template-columns:minmax(220px,1fr) 200px 100px 36px;gap:12px;align-items:center;padding:12px 14px;border-top:1px solid #e5eaf1}
+.modalBody{padding:18px 20px}.modalFooter{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid #dbe3ed}
+.modal .field{background:white;color:#17202b;border-color:#ccd6e2}
+.modalGrid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.75fr);gap:16px}
+.simEditor{display:grid;gap:12px}.simGroup{background:white;border:1px solid #dbe3ed;border-radius:10px;overflow:hidden}
+.simGroupHead{display:flex;justify-content:space-between;padding:12px 14px;background:#eef2f7;color:#1475d1;font-weight:700}
+.simRow{display:grid;grid-template-columns:minmax(220px,1fr) 190px 95px 36px;gap:10px;align-items:center;padding:11px 14px;border-top:1px solid #e5eaf1}
 .simRow input[type=range]{width:100%}.simRow input[type=number]{width:100%;padding:8px;border:1px solid #cfd8e5;border-radius:7px}
-.rightTabs{display:flex;gap:8px;border-bottom:1px solid #dbe3ed;margin-bottom:14px}
-.rightTab{padding:9px 8px;border:0;background:transparent;color:#68798e;border-bottom:3px solid transparent}
-.rightTab.active{color:#1475d1;border-bottom-color:#1475d1;font-weight:700}
-.summaryBox{border:1px solid #dbe3ed;background:white;border-radius:10px;padding:14px;margin-bottom:14px}
+.summaryBox{background:white;border:1px solid #dbe3ed;border-radius:10px;padding:14px;margin-bottom:12px}
 .summaryBox table{color:#17202b}.summaryBox th,.summaryBox td{border-bottom:1px solid #e7ebf0}
-.modalFooter{display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid #dbe3ed}
-.modalFooter .btn{color:#17202b;background:white;border-color:#cfd8e5}.modalFooter .primary{background:#1475d1;color:white;border-color:#1475d1}
 .etfPicker{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.etfList{max-height:420px;overflow:auto;border:1px solid #dbe3ed;border-radius:9px;background:white}
-.etfItem{padding:11px 12px;border-bottom:1px solid #eef2f7;display:flex;justify-content:space-between;gap:10px}
-.etfItem:hover{background:#f0f6ff}
 .searchBox{width:100%;padding:10px;border:1px solid #cfd8e5;border-radius:8px;margin-bottom:10px}
-.pill{padding:3px 7px;border-radius:999px;background:#edf4ff;color:#2968b7;font-size:11px}
-@media(max-width:1100px){.app{grid-template-columns:1fr}.sidebar{display:none}.kpis{grid-template-columns:repeat(3,1fr)}.layout{grid-template-columns:1fr}.simGrid{grid-template-columns:1fr}.simLeft{border-right:0;border-bottom:1px solid #dbe3ed}}
-@media(max-width:700px){.main{padding:10px}.kpis{grid-template-columns:repeat(2,1fr)}.compare,.assetTotals,.etfPicker{grid-template-columns:1fr}.simRow{grid-template-columns:1fr}.modalBox{width:100%;max-height:96vh}}
+.etfList{max-height:500px;overflow:auto;border:1px solid #dbe3ed;border-radius:9px;background:white}
+.etfItem{padding:11px 12px;border-bottom:1px solid #eef2f7;display:flex;justify-content:space-between;gap:10px}.etfItem:hover{background:#f0f6ff}
+.pill{display:inline-block;padding:3px 7px;border-radius:999px;background:#edf4ff;color:#2968b7;font-size:11px}
+.totalBox{background:white;border:1px solid #dbe3ed;border-radius:9px;padding:12px;margin-bottom:12px}
+.progress{height:10px;background:#e7edf5;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:#39a64f}
+@media(max-width:1100px){.app{grid-template-columns:1fr}.sidebar{display:none}.kpis{grid-template-columns:repeat(3,1fr)}.grid2,.modalGrid{grid-template-columns:1fr}}
+@media(max-width:700px){.main{padding:10px}.kpis{grid-template-columns:repeat(2,1fr)}.compareGrid,.etfPicker{grid-template-columns:1fr}.simRow{grid-template-columns:1fr}.barRow{grid-template-columns:100px 1fr 48px}.modalBox{width:100%;max-height:96vh}}
 </style>
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
   <div class="brand">Portfolio Optimizer</div>
-  <div class="sub">Proyecto personal · Markowitz</div>
+  <div class="subtitle">Proyecto personal · Asset Allocation</div>
   <button class="nav active" data-view="dashboard">Dashboard</button>
-  <button class="nav" data-view="builder">Constructor</button>
-  <button class="nav" data-view="scenarios">Escenarios</button>
-  <button class="nav" data-view="frontierView">Frontera eficiente</button>
-  <button class="nav" data-view="historyView">Historial</button>
-  <p class="sub" style="margin-top:28px">Datos teóricos para simulación. No constituye asesoría financiera.</p>
+  <button class="nav" data-view="proposal">Propuesta</button>
+  <button class="nav" data-view="markowitz">Markowitz / Black-Litterman</button>
+  <button class="nav" data-view="exposures">Exposiciones y riesgo</button>
+  <button class="nav" data-view="saved">Portafolios guardados</button>
+  <p class="subtitle" style="margin-top:28px">Datos y sensibilidades teóricas. No constituye asesoría financiera.</p>
 </aside>
 
 <main class="main">
-<div class="top">
-  <div><h1>Portfolio Construction Workstation</h1><p>Portafolio inicial, propuesta y aplicación de cambios</p></div>
-  <div class="actions">
-    <button class="btn" id="openAdd">+ Agregar ETF</button>
-    <button class="btn" id="openSimulator">Simular cartera</button>
-    <button class="btn" id="optimizeBtn">Optimizar</button>
-    <button class="btn primary" id="applyBtn">Aplicar cambios</button>
+<div class="topbar">
+  <div><h1 id="pageTitle">Dashboard</h1><p id="pageSubtitle">Portafolio oficial y simulaciones guardadas</p></div>
+  <div class="actions" id="globalActions">
+    <button class="btn" id="addETFBtn">+ Agregar ETF</button>
+    <button class="btn" id="newSimulationBtn">Simular portafolio</button>
     <button class="btn" id="exportBtn">Exportar CSV</button>
   </div>
 </div>
 
-<section class="kpis">
-  <div class="card kpi"><small>Retorno esperado</small><b id="kRet">—</b></div>
-  <div class="card kpi"><small>Volatilidad</small><b id="kVol">—</b></div>
-  <div class="card kpi"><small>Sharpe</small><b id="kSharpe">—</b></div>
-  <div class="card kpi"><small>Yield</small><b id="kYield">—</b></div>
-  <div class="card kpi"><small>Duración</small><b id="kDur">—</b></div>
-  <div class="card kpi"><small>VaR 95%</small><b id="kVar">—</b></div>
-</section>
-
 <section id="dashboard" class="view active">
-  <div class="layout">
+  <div class="kpis" id="officialKPIs"></div>
+  <div class="grid2">
     <div class="stack">
       <div class="card">
-        <div class="sectionHead"><h2>Portafolio inicial vs propuesta</h2><span>La propuesta no reemplaza al inicial hasta pulsar “Aplicar cambios”</span></div>
-        <div id="assetTotals" class="assetTotals"></div>
-        <div class="tableWrap"><table><thead><tr><th>Ticker</th><th>Clase</th><th>Peso inicial</th><th>Peso propuesto</th><th>Ret.</th><th>Vol.</th><th>Yield</th><th>Dur.</th><th></th></tr></thead><tbody id="portfolioBody"></tbody></table></div>
+        <div class="sectionHead"><h2>Portafolio oficial</h2><span id="officialName"></span></div>
+        <div class="tableWrap"><table><thead><tr><th>Ticker</th><th>Nombre</th><th>Asset class</th><th>Peso</th><th>Ret.</th><th>Vol.</th><th>Yield</th><th>Dur.</th></tr></thead><tbody id="officialTable"></tbody></table></div>
       </div>
-      <div class="card"><div class="sectionHead"><h2>Frontera eficiente</h2><span>Verde: inicial · Amarillo: propuesta</span></div><canvas id="frontier" class="chart"></canvas></div>
-      <div class="card"><div class="sectionHead"><h2>Contribución al riesgo</h2></div><canvas id="riskChart" class="chart" style="height:240px"></canvas></div>
+      <div class="card">
+        <div class="sectionHead"><h2>Simulaciones guardadas</h2><button class="btn" id="newSimulationBtn2">+ Nueva simulación</button></div>
+        <div id="dashboardSimulations" class="simCards"></div>
+      </div>
     </div>
-
     <div class="stack">
       <div class="card">
-        <div class="sectionHead"><h2>Escenario rápido</h2><button class="btn" id="resetScen">Reset</button></div>
+        <div class="sectionHead"><h2>Comparación seleccionada</h2><span id="selectedSimulationName">Ninguna</span></div>
+        <div id="selectedCompare" class="note">Guarda o selecciona una simulación para compararla con el portafolio oficial.</div>
+      </div>
+      <div class="card"><div class="sectionHead"><h2>Exposición rápida</h2></div><div id="quickExposure"></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="proposal" class="view">
+  <div class="grid2">
+    <div class="stack">
+      <div class="card">
+        <div class="sectionHead"><h2>Sensibilidad macro por instrumento</h2><span>No modifica el portafolio oficial</span></div>
         <div class="controls">
-          <div class="control"><label><span>Fed / curva</span><b id="rateVal">0 pb</b></label><input id="rate" type="range" min="-500" max="500" step="25" value="0"></div>
-          <div class="control"><label><span>Inflación</span><b id="inflVal">0.0%</b></label><input id="infl" type="range" min="-5" max="5" step=".25" value="0"></div>
-          <div class="control"><label><span>Spread IG</span><b id="igVal">0 pb</b></label><input id="ig" type="range" min="0" max="500" step="25" value="0"></div>
-          <div class="control"><label><span>Spread HY</span><b id="hyVal">0 pb</b></label><input id="hy" type="range" min="0" max="500" step="25" value="0"></div>
-          <div class="control"><label><span>USD</span><b id="usdVal">0%</b></label><input id="usd" type="range" min="-20" max="20" step="1" value="0"></div>
-          <div class="control"><label><span>VIX</span><b id="vixVal">20</b></label><input id="vix" type="range" min="10" max="80" step="1" value="20"></div>
+          <div class="control"><label>Fed / curva <b id="mRateVal">0 pb</b></label><input id="mRate" type="range" min="-500" max="500" step="25" value="0"></div>
+          <div class="control"><label>Inflación <b id="mInflVal">0.0%</b></label><input id="mInfl" type="range" min="-5" max="5" step=".25" value="0"></div>
+          <div class="control"><label>Spread IG <b id="mIGVal">0 pb</b></label><input id="mIG" type="range" min="0" max="500" step="25" value="0"></div>
+          <div class="control"><label>Spread HY <b id="mHYVal">0 pb</b></label><input id="mHY" type="range" min="0" max="500" step="25" value="0"></div>
+          <div class="control"><label>USD <b id="mUSDVal">0%</b></label><input id="mUSD" type="range" min="-20" max="20" step="1" value="0"></div>
+          <div class="control"><label>VIX <b id="mVIXVal">20</b></label><input id="mVIX" type="range" min="10" max="80" step="1" value="20"></div>
         </div>
       </div>
       <div class="card">
-        <div class="sectionHead"><h2>Comparativo</h2></div>
-        <div class="compare">
-          <div class="mini"><span>Sharpe inicial</span><b id="shA">—</b></div>
-          <div class="mini"><span>Sharpe propuesto</span><b id="shP">—</b></div>
-          <div class="mini"><span>Cambio</span><b id="shD">—</b></div>
-        </div>
-        <p class="advisor" id="advisor"></p>
+        <div class="sectionHead"><h2>Tabla de sensibilidad</h2><span>Impacto estimado en retorno esperado</span></div>
+        <div class="tableWrap"><table class="sensitivity"><thead><tr><th>Ticker</th><th>Asset class</th><th>Retorno base</th><th>Impacto</th><th>Retorno estresado</th><th>Vol. estresada</th></tr></thead><tbody id="sensitivityTable"></tbody></table></div>
       </div>
-      <div class="card"><div class="sectionHead"><h2>Historial</h2></div><div id="historyMini" class="history">Sin cambios aplicados.</div></div>
+    </div>
+    <div class="stack">
+      <div class="card">
+        <div class="sectionHead"><h2>Resumen del escenario</h2><button class="btn" id="resetMacroBtn">Reset</button></div>
+        <div id="macroSummary" class="note"></div>
+      </div>
+      <div class="card">
+        <div class="sectionHead"><h2>Convertir escenario</h2></div>
+        <p class="note">Genera una propuesta optimizada usando los retornos estresados. Se guarda como simulación y no será oficial hasta que la aceptes.</p>
+        <input id="macroPortfolioName" class="field" value="Propuesta macro">
+        <div style="height:8px"></div>
+        <button class="btn primary" id="macroToSimulationBtn">Crear portafolio simulado</button>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="builder" class="view">
-  <div class="card">
-    <div class="sectionHead"><h2>Constructor por Asset Class</h2><button class="btn" id="normalizeBtn">Normalizar a 100%</button></div>
-    <div id="builderContent"></div>
+<section id="markowitz" class="view">
+  <div class="grid2">
+    <div class="stack">
+      <div class="card">
+        <div class="sectionHead"><h2>Frontera eficiente</h2><span>Portafolio oficial y simulaciones guardadas</span></div>
+        <div class="frontierLegend">
+          <span><i class="dot" style="background:#2ea8ff"></i>Monte Carlo</span>
+          <span><i class="dot" style="background:#35d18a"></i>Frontera eficiente</span>
+          <span><i class="dot" style="background:#f4c34f"></i>Portafolio oficial</span>
+          <span><i class="dot" style="background:#ff6b78"></i>Simulaciones</span>
+        </div>
+        <canvas id="frontierCanvas" class="chart" style="height:560px;margin-top:10px"></canvas>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="card">
+        <div class="sectionHead"><h2>Crear propuesta</h2></div>
+        <label>Modelo<select id="modelType" class="field"><option value="markowitz">Markowitz</option><option value="blacklitterman">Black-Litterman simplificado</option></select></label>
+        <div style="height:10px"></div>
+        <label>Objetivo<select id="markowitzObjective" class="field"><option value="sharpe">Máximo Sharpe</option><option value="minvar">Mínima varianza</option><option value="target">Retorno objetivo</option></select></label>
+        <div style="height:10px"></div>
+        <label>Peso máximo por ETF <b id="maxWeightVal">25%</b></label>
+        <input id="maxWeight" type="range" min="10" max="60" step="5" value="25" style="width:100%">
+        <div style="height:10px"></div>
+        <label>Retorno objetivo <b id="targetRetVal">7.00%</b></label>
+        <input id="targetRet" type="range" min="3" max="14" step=".25" value="7" style="width:100%">
+        <div style="height:10px"></div>
+        <input id="markowitzName" class="field" value="Propuesta Markowitz">
+        <div style="height:8px"></div>
+        <button class="btn primary" id="createMarkowitzBtn">Crear y guardar simulación</button>
+      </div>
+      <div class="card"><div class="sectionHead"><h2>Lectura de la frontera</h2></div><div id="frontierCommentary" class="note"></div></div>
+    </div>
   </div>
 </section>
 
-<section id="scenarios" class="view">
-  <div class="card">
-    <div class="sectionHead"><h2>Escenarios guardados</h2><button class="btn" id="saveScenarioBtn">Guardar escenario actual</button></div>
-    <div id="scenarioList" class="history">No hay escenarios guardados.</div>
+<section id="exposures" class="view">
+  <div class="kpis" id="riskKPIs"></div>
+  <div class="grid2">
+    <div class="stack">
+      <div class="card"><div class="sectionHead"><h2>Asset class</h2></div><div id="assetExposure" class="barList"></div></div>
+      <div class="card"><div class="sectionHead"><h2>Regiones</h2></div><div id="regionExposure" class="barList"></div></div>
+    </div>
+    <div class="stack">
+      <div class="card"><div class="sectionHead"><h2>Temáticas</h2></div><div id="themeExposure" class="barList"></div></div>
+      <div class="card"><div class="sectionHead"><h2>Sectores</h2></div><div id="sectorExposure" class="barList"></div></div>
+    </div>
   </div>
 </section>
 
-<section id="frontierView" class="view">
-  <div class="card"><div class="sectionHead"><h2>Frontera eficiente ampliada</h2></div><canvas id="frontierLarge" class="chart" style="height:560px"></canvas></div>
-</section>
-
-<section id="historyView" class="view">
-  <div class="card"><div class="sectionHead"><h2>Historial de portafolios aplicados</h2></div><div id="historyFull" class="history">Sin cambios aplicados.</div></div>
+<section id="saved" class="view">
+  <div class="card">
+    <div class="sectionHead"><h2>Portafolios simulados guardados</h2><button class="btn" id="newSimulationBtn3">+ Nueva simulación</button></div>
+    <div id="savedSimulations" class="simCards"></div>
+  </div>
 </section>
 </main>
 </div>
 
-<div class="modal" id="simModal">
+<div class="modal" id="simulationModal">
   <div class="modalBox">
-    <div class="modalTop"><h2>Simulador de Carteras</h2><button class="closeX" id="closeSim">×</button></div>
-    <div class="profileTabs">
-      <button class="profileTab active" data-profile="proteccion">Protección</button>
-      <button class="profileTab" data-profile="conservador">Conservador</button>
-      <button class="profileTab" data-profile="balanceado">Balanceado</button>
-      <button class="profileTab" data-profile="agresivo">Agresivo</button>
-      <button class="profileTab" id="simAddETF">+ Agregar ETF</button>
-      <button class="profileTab" id="simNormalize">Normalizar a 100%</button>
-    </div>
-    <div class="simGrid">
-      <div class="simLeft">
-        <div class="totalBox">
-          <div style="display:flex;justify-content:space-between"><b>Total: <span id="simTotal">100.0%</span></b><span id="simTotalStatus">Suma 100%</span></div>
-          <div class="progress" style="margin-top:10px"><i id="simProgress" style="width:100%"></i></div>
+    <div class="modalTop"><h2>Simular portafolio</h2><button class="closeX" id="closeSimulation">×</button></div>
+    <div class="modalBody">
+      <div class="modalGrid">
+        <div>
+          <div class="totalBox">
+            <div style="display:flex;justify-content:space-between"><b>Total: <span id="simTotal">100.0%</span></b><span id="simStatus">Suma 100%</span></div>
+            <div class="progress" style="margin-top:9px"><i id="simProgress" style="width:100%"></i></div>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <button class="btn light" id="normalizeSimulationBtn">Normalizar a 100%</button>
+              <button class="btn light" id="simulationAddETFBtn">+ Agregar ETF</button>
+            </div>
+          </div>
+          <div id="simulationEditor" class="simEditor"></div>
         </div>
-        <div id="simGroups"></div>
-      </div>
-      <div class="simRight">
-        <div class="rightTabs">
-          <button class="rightTab active">Métricas</button>
-          <button class="rightTab">Actual vs Propuesto</button>
-          <button class="rightTab">vs Benchmark</button>
+        <div>
+          <div class="summaryBox"><h3>Nombre de la simulación</h3><input id="simulationName" class="field" value="Portafolio simulado"></div>
+          <div class="summaryBox"><h3>Métricas</h3><div id="simulationMetrics"></div></div>
+          <div class="summaryBox"><h3>Comparación vs oficial</h3><div id="simulationCompare"></div></div>
         </div>
-        <div class="summaryBox"><h3>Asset Allocation</h3><div id="simAllocation"></div></div>
-        <div class="summaryBox"><h3>Métricas</h3><div id="simMetrics"></div></div>
       </div>
     </div>
     <div class="modalFooter">
-      <button class="btn" id="cancelSim">Cerrar</button>
-      <button class="btn primary" id="saveSim">Guardar propuesta</button>
+      <button class="btn light" id="cancelSimulation">Cancelar</button>
+      <button class="btn primary" id="saveSimulationBtn">Guardar simulación</button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="etfModal">
-  <div class="modalBox" style="width:min(900px,96vw)">
+  <div class="modalBox" style="width:min(930px,96vw)">
     <div class="modalTop"><h2>Agregar ETF</h2><button class="closeX" id="closeETF">×</button></div>
-    <div style="padding:18px 20px">
-      <input id="etfSearch" class="searchBox" placeholder="Buscar ticker, nombre o asset class...">
+    <div class="modalBody">
+      <input id="etfSearch" class="searchBox" placeholder="Buscar ticker, país, sector, temática, bonos o commodities...">
       <div class="etfPicker">
         <div class="etfList" id="etfList"></div>
         <div class="summaryBox" id="etfDetails"><p>Selecciona un ETF para ver detalles.</p></div>
@@ -238,207 +270,341 @@ td input{width:76px}
 <script>
 const RF=4;
 const ETF_UNIVERSE=[
-['SHY','iShares 1-3 Year Treasury','Renta Fija Corto Plazo',4.3,1.7,4.3,1.8],
-['BIL','SPDR 1-3 Month T-Bill','Renta Fija Corto Plazo',4.2,0.5,4.2,0.2],
-['SGOV','iShares 0-3 Month Treasury','Renta Fija Corto Plazo',4.2,0.4,4.2,0.1],
-['USFR','WisdomTree Floating Rate Treasury','Renta Fija Corto Plazo',4.5,0.9,4.5,0.1],
-['BSV','Vanguard Short-Term Bond','Renta Fija Corto Plazo',4.7,2.8,4.4,2.7],
-['VGSH','Vanguard Short-Term Treasury','Renta Fija Corto Plazo',4.5,2.2,4.3,1.9],
-['AGG','iShares Core US Aggregate','Renta Fija',5.2,5.7,4.6,6.1],
-['BND','Vanguard Total Bond Market','Renta Fija',5.1,5.8,4.5,6.2],
-['IEF','iShares 7-10 Year Treasury','Renta Fija',5.4,7.6,4.4,7.3],
-['TLT','iShares 20+ Year Treasury','Renta Fija',5.8,14.0,4.5,16.0],
-['VGIT','Vanguard Intermediate Treasury','Renta Fija',5.1,5.1,4.3,5.4],
-['TIP','iShares TIPS Bond','TIPS',5.6,6.4,4.2,6.7],
-['SCHP','Schwab U.S. TIPS','TIPS',5.5,6.2,4.1,6.4],
-['LQD','iShares iBoxx IG Corporate','Crédito IG',6.3,8.2,5.3,8.4],
-['VCIT','Vanguard Intermediate Corporate','Crédito IG',6.0,6.9,5.2,6.2],
-['VCSH','Vanguard Short-Term Corporate','Crédito IG',5.4,3.3,5.1,2.7],
-['HYG','iShares iBoxx High Yield','High Yield',7.5,9.5,7.2,3.2],
-['JNK','SPDR Bloomberg High Yield','High Yield',7.7,9.8,7.4,3.4],
-['EMB','iShares JPM USD Emerging Markets','Deuda Emergente',7.1,9.3,6.8,6.5],
-['EMLC','VanEck JPM EM Local Currency','Deuda Emergente',8.0,12.5,6.5,5.3],
-['SPY','SPDR S&P 500','Renta Variable US',8.2,16.5,1.2,0],
-['QQQ','Invesco QQQ','Renta Variable US',9.0,22.0,0.6,0],
-['IWM','iShares Russell 2000','Renta Variable US',8.6,24.0,1.3,0],
-['EFA','iShares MSCI EAFE','Renta Variable Internacional',8.0,18.0,2.8,0],
-['EEM','iShares MSCI Emerging Markets','Renta Variable Emergente',8.8,22.0,2.5,0],
-['EWJ','iShares MSCI Japan','Renta Variable Internacional',8.1,17.0,2.1,0],
-['GLD','SPDR Gold Shares','Oro',6.4,15.5,0,0],
-['IAU','iShares Gold Trust','Oro',6.3,15.2,0,0],
-['DBC','Invesco DB Commodity Index','Commodities',6.8,19.0,0,0],
-['VNQ','Vanguard Real Estate','REITs',7.2,20.0,3.8,0]
-].map(x=>({ticker:x[0],name:x[1],assetClass:x[2],expectedReturn:x[3],vol:x[4],yield:x[5],duration:x[6]}));
+['SPY','SPDR S&P 500 ETF Trust','Renta Variable US','Norteamérica','Broad Market','US Large Cap',8.2,16.5,1.2,0],
+['IVV','iShares Core S&P 500','Renta Variable US','Norteamérica','Broad Market','US Large Cap',8.2,16.4,1.2,0],
+['QQQ','Invesco QQQ','Renta Variable US','Norteamérica','Tecnología / AI','US Growth',9.0,22.0,.6,0],
+['IWM','iShares Russell 2000','Renta Variable US','Norteamérica','Small Caps','US Small Cap',8.6,24.0,1.3,0],
+['DIA','SPDR Dow Jones Industrial Average','Renta Variable US','Norteamérica','Broad Market','US Large Cap',7.8,15.0,1.6,0],
+['RSP','Invesco S&P 500 Equal Weight','Renta Variable US','Norteamérica','Broad Market','US Equal Weight',8.0,17.0,1.5,0],
+['XLK','Technology Select Sector SPDR','Sector US','Norteamérica','Tecnología / AI','Tecnología',9.3,23.0,.7,0],
+['XLC','Communication Services Select Sector SPDR','Sector US','Norteamérica','Digital / AI','Comunicaciones',8.8,20.0,.9,0],
+['XLY','Consumer Discretionary Select Sector SPDR','Sector US','Norteamérica','Consumo','Consumo Discrecional',8.4,21.0,.8,0],
+['XLP','Consumer Staples Select Sector SPDR','Sector US','Norteamérica','Defensivo','Consumo Básico',6.8,13.0,2.6,0],
+['XLE','Energy Select Sector SPDR','Sector US','Norteamérica','Energía','Energía',7.5,24.0,3.2,0],
+['XLF','Financial Select Sector SPDR','Sector US','Norteamérica','Financieras','Financieras',7.7,19.0,1.6,0],
+['XLV','Health Care Select Sector SPDR','Sector US','Norteamérica','Salud','Salud',7.4,15.0,1.8,0],
+['XLI','Industrial Select Sector SPDR','Sector US','Norteamérica','Industriales','Industriales',7.9,18.0,1.5,0],
+['XLB','Materials Select Sector SPDR','Sector US','Norteamérica','Materiales','Materiales',7.3,19.0,2.0,0],
+['XLRE','Real Estate Select Sector SPDR','Sector US','Norteamérica','Real Estate','Real Estate',7.0,20.0,3.8,0],
+['XLU','Utilities Select Sector SPDR','Sector US','Norteamérica','Defensivo','Utilities',6.6,15.0,3.4,0],
+['SMH','VanEck Semiconductor ETF','Temático','Global','Tecnología / AI','Semiconductores',10.0,30.0,.5,0],
+['SOXX','iShares Semiconductor ETF','Temático','Global','Tecnología / AI','Semiconductores',9.8,29.0,.6,0],
+['BOTZ','Global X Robotics & Artificial Intelligence','Temático','Global','Robótica / AI','Tecnología',9.0,25.0,.4,0],
+['ROBO','ROBO Global Robotics & Automation','Temático','Global','Robótica / AI','Industriales',8.6,23.0,.5,0],
+['AIQ','Global X Artificial Intelligence & Technology','Temático','Global','Inteligencia Artificial','Tecnología',9.2,24.0,.5,0],
+['ARTY','iShares Future AI & Tech ETF','Temático','Global','Inteligencia Artificial','Tecnología',9.1,25.0,.4,0],
+['CLOU','Global X Cloud Computing','Temático','Global','Cloud / AI','Tecnología',8.8,27.0,.2,0],
+['CIBR','First Trust Nasdaq Cybersecurity','Temático','Global','Ciberseguridad','Tecnología',8.7,22.0,.4,0],
+['HACK','ETFMG Prime Cyber Security','Temático','Global','Ciberseguridad','Tecnología',8.5,22.0,.5,0],
+['ARKQ','ARK Autonomous Technology & Robotics','Temático','Global','Robótica / AI','Tecnología',10.0,35.0,.1,0],
+['IRBO','iShares Robotics and Artificial Intelligence','Temático','Global','Robótica / AI','Tecnología',8.7,23.0,.8,0],
+['EFA','iShares MSCI EAFE','Renta Variable Internacional','Desarrollados ex-US','Broad Market','Internacional',8.0,18.0,2.8,0],
+['VEA','Vanguard FTSE Developed Markets','Renta Variable Internacional','Desarrollados ex-US','Broad Market','Internacional',7.9,17.5,3.0,0],
+['IEFA','iShares Core MSCI EAFE','Renta Variable Internacional','Desarrollados ex-US','Broad Market','Internacional',7.9,17.6,2.9,0],
+['EEM','iShares MSCI Emerging Markets','Renta Variable Emergente','Emergentes','Broad Market','Emergentes',8.8,22.0,2.5,0],
+['IEMG','iShares Core MSCI Emerging Markets','Renta Variable Emergente','Emergentes','Broad Market','Emergentes',8.7,21.5,2.6,0],
+['EWJ','iShares MSCI Japan','País','Japón','País','Japón',8.1,17.0,2.1,0],
+['EWG','iShares MSCI Germany','País','Alemania','País','Alemania',7.8,20.0,2.8,0],
+['EWU','iShares MSCI United Kingdom','País','Reino Unido','País','Reino Unido',7.3,16.0,4.0,0],
+['EWQ','iShares MSCI France','País','Francia','País','Francia',7.4,19.0,2.9,0],
+['EWI','iShares MSCI Italy','País','Italia','País','Italia',7.8,21.0,3.2,0],
+['EWP','iShares MSCI Spain','País','España','País','España',7.7,20.0,3.0,0],
+['EWC','iShares MSCI Canada','País','Canadá','País','Canadá',7.6,18.0,2.7,0],
+['EWA','iShares MSCI Australia','País','Australia','País','Australia',7.5,19.0,3.5,0],
+['EWZ','iShares MSCI Brazil','País','Brasil','País','Brasil',9.0,30.0,6.0,0],
+['EWW','iShares MSCI Mexico','País','México','País','México',8.5,25.0,2.5,0],
+['MCHI','iShares MSCI China','País','China','País','China',9.2,28.0,2.0,0],
+['INDA','iShares MSCI India','País','India','País','India',9.5,23.0,.8,0],
+['EWY','iShares MSCI South Korea','País','Corea del Sur','País','Corea del Sur',8.8,24.0,1.8,0],
+['EWT','iShares MSCI Taiwan','País','Taiwán','País / Semiconductores','Taiwán',9.2,24.0,1.6,0],
+['SHY','iShares 1-3 Year Treasury','Renta Fija Corto Plazo','Norteamérica','Bonos','Treasury corto',4.3,1.7,4.3,1.8],
+['BIL','SPDR 1-3 Month T-Bill','Renta Fija Corto Plazo','Norteamérica','Bonos','T-Bills',4.2,.5,4.2,.2],
+['SGOV','iShares 0-3 Month Treasury','Renta Fija Corto Plazo','Norteamérica','Bonos','T-Bills',4.2,.4,4.2,.1],
+['USFR','WisdomTree Floating Rate Treasury','Renta Fija Corto Plazo','Norteamérica','Bonos','Floating Treasury',4.5,.9,4.5,.1],
+['BSV','Vanguard Short-Term Bond','Renta Fija Corto Plazo','Norteamérica','Bonos','Short Bond',4.7,2.8,4.4,2.7],
+['AGG','iShares Core U.S. Aggregate','Renta Fija','Norteamérica','Bonos','Aggregate',5.2,5.7,4.6,6.1],
+['BND','Vanguard Total Bond Market','Renta Fija','Norteamérica','Bonos','Aggregate',5.1,5.8,4.5,6.2],
+['IEF','iShares 7-10 Year Treasury','Renta Fija','Norteamérica','Bonos','Treasury intermedio',5.4,7.6,4.4,7.3],
+['TLT','iShares 20+ Year Treasury','Renta Fija','Norteamérica','Bonos','Treasury largo',5.8,14.0,4.5,16.0],
+['VGIT','Vanguard Intermediate Treasury','Renta Fija','Norteamérica','Bonos','Treasury intermedio',5.1,5.1,4.3,5.4],
+['TIP','iShares TIPS Bond','TIPS','Norteamérica','Inflación','TIPS',5.6,6.4,4.2,6.7],
+['SCHP','Schwab U.S. TIPS','TIPS','Norteamérica','Inflación','TIPS',5.5,6.2,4.1,6.4],
+['LQD','iShares iBoxx IG Corporate','Crédito IG','Norteamérica','Crédito','IG',6.3,8.2,5.3,8.4],
+['VCIT','Vanguard Intermediate Corporate','Crédito IG','Norteamérica','Crédito','IG',6.0,6.9,5.2,6.2],
+['VCSH','Vanguard Short-Term Corporate','Crédito IG','Norteamérica','Crédito','IG corto',5.4,3.3,5.1,2.7],
+['HYG','iShares iBoxx High Yield','High Yield','Norteamérica','Crédito','HY',7.5,9.5,7.2,3.2],
+['JNK','SPDR Bloomberg High Yield','High Yield','Norteamérica','Crédito','HY',7.7,9.8,7.4,3.4],
+['EMB','iShares JPM USD Emerging Markets','Deuda Emergente','Emergentes','Bonos','EM hard currency',7.1,9.3,6.8,6.5],
+['EMLC','VanEck JPM EM Local Currency','Deuda Emergente','Emergentes','Bonos','EM local',8.0,12.5,6.5,5.3],
+['GLD','SPDR Gold Shares','Oro','Global','Oro','Metales preciosos',6.4,15.5,0,0],
+['IAU','iShares Gold Trust','Oro','Global','Oro','Metales preciosos',6.3,15.2,0,0],
+['SLV','iShares Silver Trust','Commodities','Global','Plata','Metales preciosos',7.0,28.0,0,0],
+['DBC','Invesco DB Commodity Index','Commodities','Global','Commodities','Broad commodities',6.8,19.0,0,0],
+['PDBC','Invesco Optimum Yield Diversified Commodity','Commodities','Global','Commodities','Broad commodities',6.7,18.5,0,0],
+['USO','United States Oil Fund','Commodities','Global','Petróleo','Energía',7.3,35.0,0,0],
+['UNG','United States Natural Gas Fund','Commodities','Global','Gas natural','Energía',7.5,45.0,0,0],
+['DBA','Invesco DB Agriculture','Commodities','Global','Agricultura','Agricultura',6.5,20.0,0,0],
+['COPX','Global X Copper Miners','Commodities','Global','Cobre','Materiales',8.2,30.0,1.2,0],
+['URA','Global X Uranium','Temático','Global','Uranio / Nuclear','Energía',9.2,32.0,.7,0],
+['GRID','First Trust Nasdaq Clean Edge Smart Grid','Temático','Global','Infraestructura eléctrica / AI','Industriales',8.7,22.0,1.0,0],
+['LIT','Global X Lithium & Battery Tech','Temático','Global','Baterías / EV','Materiales',8.8,30.0,.6,0],
+['REMX','VanEck Rare Earth and Strategic Metals','Temático','Global','Tierras raras','Materiales',9.0,31.0,1.1,0],
+['VNQ','Vanguard Real Estate','REITs','Norteamérica','Real Estate','REITs',7.2,20.0,3.8,0]
+].map(x=>({ticker:x[0],name:x[1],assetClass:x[2],region:x[3],theme:x[4],sector:x[5],expectedReturn:x[6],vol:x[7],yield:x[8],duration:x[9]}));
 
-let assets=[
- mk('SHY',8),mk('AGG',18),mk('TIP',14),mk('LQD',14),mk('HYG',8),mk('SPY',14),mk('GLD',10),mk('EFA',14)
-];
-let history=[],savedScenarios=[];
-let scenario={rate:0,infl:0,ig:0,hy:0,usd:0,vix:20};
+let officialName='Portafolio oficial';
+let official=[mk('AGG',18),mk('TIP',12),mk('LQD',12),mk('HYG',8),mk('SPY',20),mk('EFA',12),mk('GLD',10),mk('SHY',8)];
+let simulations=[];
+let selectedSimulationId=null;
+let editingSimulation=[];
+let macro={rate:0,infl:0,ig:0,hy:0,usd:0,vix:20};
+let pickerTarget='official';
 let selectedETF=null;
-function mk(t,w){const e=ETF_UNIVERSE.find(x=>x.ticker===t);return {...e,weight:w,proposedWeight:w,...betas(e)}}
+
+function mk(t,w){const e=ETF_UNIVERSE.find(x=>x.ticker===t);return {...e,weight:w,...betas(e)}}
 function betas(e){
- let b={bRate:-.02,bInfl:-.05,bIG:-.05,bHY:-.05,bUSD:0,bVIX:-.03};
- if(/Renta Fija|TIPS|Crédito|Deuda/.test(e.assetClass)) b.bRate=-e.duration*.009;
- if(e.assetClass==='TIPS') b.bInfl=.7;
- if(e.assetClass==='Crédito IG') b.bIG=-.6;
- if(e.assetClass==='High Yield') b.bHY=-.8;
- if(/Renta Variable/.test(e.assetClass)){b.bVIX=-.6;b.bUSD=.05}
- if(e.assetClass==='Oro'){b.bInfl=.45;b.bUSD=-.3;b.bVIX=.18}
+ const b={rate:-.01,infl:-.05,ig:-.05,hy:-.05,usd:0,vix:-.03};
+ if(/Renta Fija|TIPS|Crédito|Deuda/.test(e.assetClass)) b.rate=-e.duration*.009;
+ if(e.assetClass==='TIPS') b.infl=.7;
+ if(e.assetClass==='Crédito IG') b.ig=-.6;
+ if(e.assetClass==='High Yield') b.hy=-.8;
+ if(/Renta Variable|Sector US|Temático|País/.test(e.assetClass)){b.vix=-.55;b.usd=.04}
+ if(e.assetClass==='Oro'){b.infl=.45;b.usd=-.3;b.vix=.18}
+ if(e.assetClass==='Commodities'){b.infl=.35;b.usd=-.2}
  return b;
 }
 const $=id=>document.getElementById(id);
-function normalize(vals){let v=vals.map(x=>Math.max(0,+x||0)),s=v.reduce((a,b)=>a+b,0)||1;return v.map(x=>x/s)}
-function ret(a){return a.expectedReturn+a.bRate*scenario.rate+a.bInfl*scenario.infl+a.bIG*scenario.ig/100+a.bHY*scenario.hy/100+a.bUSD*scenario.usd+a.bVIX*(scenario.vix-20)}
-function vol(a){const spread=a.assetClass==='High Yield'?scenario.hy:scenario.ig;return Math.max(.5,a.vol*(1+Math.max(0,scenario.vix-20)/70)*(1+spread/2500))}
+function normalizeWeights(arr){
+ const vals=arr.map(a=>Math.max(0,+a.weight||0)),sum=vals.reduce((a,b)=>a+b,0)||1;
+ return arr.map((a,i)=>({...a,weight:vals[i]/sum*100}));
+}
+function adjustedReturn(a,s=macro){
+ return a.expectedReturn+a.rate*s.rate+a.infl*s.infl+a.ig*s.ig/100+a.hy*s.hy/100+a.usd*s.usd+a.vix*(s.vix-20);
+}
+function adjustedVol(a,s=macro){
+ const spread=a.assetClass==='High Yield'?s.hy:s.ig;
+ return Math.max(.5,a.vol*(1+Math.max(0,s.vix-20)/70)*(1+spread/2500));
+}
 function corr(a,b){
  if(a.ticker===b.ticker)return 1;
- const fa=x=>/Renta Fija|TIPS|Crédito|Deuda/.test(x.assetClass);
- if(fa(a)&&fa(b))return .65;
+ const fixed=x=>/Renta Fija|TIPS|Crédito|Deuda/.test(x.assetClass);
+ if(fixed(a)&&fixed(b))return .65;
  if(a.assetClass==='Oro'||b.assetClass==='Oro')return .08;
- if(/Renta Variable/.test(a.assetClass)||/Renta Variable/.test(b.assetClass))return .35;
+ if(/Renta Variable|Sector US|Temático|País/.test(a.assetClass)||/Renta Variable|Sector US|Temático|País/.test(b.assetClass))return .35;
  return .25;
 }
-function metrics(key){
- const w=normalize(assets.map(a=>a[key])),r=w.reduce((s,x,i)=>s+x*ret(assets[i]),0);let q=0;
- for(let i=0;i<w.length;i++)for(let j=0;j<w.length;j++)q+=w[i]*w[j]*corr(assets[i],assets[j])*vol(assets[i])/100*vol(assets[j])/100;
+function metrics(port,s=macro){
+ const p=normalizeWeights(port),w=p.map(x=>x.weight/100);
+ const r=w.reduce((sum,wi,i)=>sum+wi*adjustedReturn(p[i],s),0);
+ let q=0;
+ for(let i=0;i<w.length;i++)for(let j=0;j<w.length;j++)q+=w[i]*w[j]*corr(p[i],p[j])*adjustedVol(p[i],s)/100*adjustedVol(p[j],s)/100;
  const v=Math.sqrt(q)*100;
- return {w,r,v,sh:(r-RF)/(v||1),y:w.reduce((s,x,i)=>s+x*assets[i].yield,0),d:w.reduce((s,x,i)=>s+x*assets[i].duration,0),var95:Math.max(0,1.645*v-r)};
+ return {ret:r,vol:v,sharpe:(r-RF)/(v||1),yield:w.reduce((s,x,i)=>s+x*p[i].yield,0),duration:w.reduce((s,x,i)=>s+x*p[i].duration,0),var95:Math.max(0,1.645*v-r),weights:w};
 }
-function groups(){
- const m={};assets.forEach(a=>(m[a.assetClass]??=[]).push(a));return m;
+function exposure(port,key){
+ const out={};normalizeWeights(port).forEach(a=>out[a[key]]=(out[a[key]]||0)+a.weight);return out;
 }
-function groupWeights(key){
- const out={};for(const [g,list] of Object.entries(groups())) out[g]=list.reduce((s,a)=>s+(+a[key]||0),0);return out;
+function renderKPI(container,m){
+ container.innerHTML=[
+  ['Retorno esperado',m.ret.toFixed(2)+'%'],['Volatilidad',m.vol.toFixed(2)+'%'],['Sharpe',m.sharpe.toFixed(2)],
+  ['Yield',m.yield.toFixed(2)+'%'],['Duración',m.duration.toFixed(2)+'y'],['VaR 95%',m.var95.toFixed(2)+'%']
+ ].map(([l,v])=>`<div class="card kpi"><small>${l}</small><b>${v}</b></div>`).join('');
 }
-function renderAll(){
- renderPortfolio();renderAssetTotals();renderKPIs();renderBuilder();renderHistory();renderScenarios();drawFrontiers();drawRisk();saveLocal();
-}
-function renderPortfolio(){
- const body=$('portfolioBody');body.innerHTML='';
- for(const [g,list] of Object.entries(groups())){
-   const gh=document.createElement('tr');gh.innerHTML=`<td class="groupHeader" colspan="9">${g} · ${list.length} ETFs</td>`;body.appendChild(gh);
-   list.forEach(a=>{
-     const i=assets.indexOf(a),tr=document.createElement('tr');
-     tr.innerHTML=`<td><b>${a.ticker}</b><br><span class="muted">${a.name}</span></td><td><span class="tag">${a.assetClass}</span></td>
-     <td><span class="weightBar"><i style="width:${Math.min(100,a.weight)}%"></i></span>${a.weight.toFixed(1)}%</td>
-     <td><input data-i="${i}" class="proposalInput" type="number" min="0" max="100" step=".5" value="${a.proposedWeight.toFixed(1)}"></td>
-     <td>${ret(a).toFixed(2)}%</td><td>${vol(a).toFixed(2)}%</td><td>${a.yield.toFixed(2)}%</td><td>${a.duration.toFixed(1)}</td>
-     <td><button class="btn danger removeBtn" data-i="${i}">×</button></td>`;
-     body.appendChild(tr);
-   });
+function groupedRows(port){
+ const groups={};normalizeWeights(port).forEach(a=>(groups[a.assetClass]??=[]).push(a));
+ let html='';
+ for(const [g,list] of Object.entries(groups)){
+  html+=`<tr><td class="groupRow" colspan="8">${g} · ${list.length} ETFs</td></tr>`;
+  list.forEach(a=>html+=`<tr><td><b>${a.ticker}</b></td><td>${a.name}</td><td><span class="tag">${a.assetClass}</span></td>
+  <td><span class="weightBar"><i style="width:${Math.min(100,a.weight)}%"></i></span>${a.weight.toFixed(1)}%</td>
+  <td>${a.expectedReturn.toFixed(2)}%</td><td>${a.vol.toFixed(2)}%</td><td>${a.yield.toFixed(2)}%</td><td>${a.duration.toFixed(1)}</td></tr>`);
  }
- document.querySelectorAll('.proposalInput').forEach(e=>e.onchange=()=>{assets[+e.dataset.i].proposedWeight=+e.value;renderAll()});
- document.querySelectorAll('.removeBtn').forEach(e=>e.onclick=()=>{assets.splice(+e.dataset.i,1);renderAll()});
+ return html;
 }
-function renderAssetTotals(){
- const a=groupWeights('weight'),p=groupWeights('proposedWeight'),box=$('assetTotals');box.innerHTML='';
- Object.keys({...a,...p}).forEach(g=>box.innerHTML+=`<div class="assetTotal"><span class="muted">${g}</span><b>${(a[g]||0).toFixed(1)}% → ${(p[g]||0).toFixed(1)}%</b></div>`);
-}
-function renderKPIs(){
- const a=metrics('weight'),p=metrics('proposedWeight');
- kRet.textContent=p.r.toFixed(2)+'%';kVol.textContent=p.v.toFixed(2)+'%';kSharpe.textContent=p.sh.toFixed(2);
- kYield.textContent=p.y.toFixed(2)+'%';kDur.textContent=p.d.toFixed(2)+'y';kVar.textContent=p.var95.toFixed(2)+'%';
- shA.textContent=a.sh.toFixed(2);shP.textContent=p.sh.toFixed(2);const d=p.sh-a.sh;shD.textContent=(d>=0?'+':'')+d.toFixed(2);shD.className=d>=0?'good':'bad';
- advisor.innerHTML=`La propuesta ${d>=0?'mejora':'reduce'} el Sharpe en ${Math.abs(d).toFixed(2)}. El portafolio inicial permanece intacto hasta que pulses <b>Aplicar cambios</b>.`;
-}
-function renderBuilder(){
- const box=$('builderContent');box.innerHTML='';
- for(const [g,list] of Object.entries(groups())){
-   const total=list.reduce((s,a)=>s+a.proposedWeight,0);
-   const wrap=document.createElement('div');wrap.className='simGroup';
-   wrap.innerHTML=`<div class="simGroupHead"><span>${g}</span><span>${total.toFixed(1)}%</span></div>`;
-   list.forEach(a=>{const i=assets.indexOf(a);wrap.innerHTML+=`<div class="simRow"><div><b>${a.ticker}</b><br><span class="muted">${a.name}</span></div><input data-i="${i}" class="builderRange" type="range" min="0" max="60" step=".5" value="${a.proposedWeight}"><input data-i="${i}" class="builderNum" type="number" min="0" max="100" step=".5" value="${a.proposedWeight.toFixed(1)}"><button class="btn danger removeBuilder" data-i="${i}">×</button></div>`});
-   box.appendChild(wrap);
+function renderDashboard(){
+ const m=metrics(official,{rate:0,infl:0,ig:0,hy:0,usd:0,vix:20});
+ renderKPI(officialKPIs,m);officialName.textContent=window.officialName;officialTable.innerHTML=groupedRows(official);
+ renderSimulationCards(dashboardSimulations);renderSimulationCards(savedSimulations);
+ quickExposure.innerHTML=renderBars(exposure(official,'assetClass'));
+ const sim=simulations.find(x=>x.id===selectedSimulationId);
+ selectedSimulationName.textContent=sim?sim.name:'Ninguna';
+ if(!sim){selectedCompare.textContent='Guarda o selecciona una simulación para compararla con el portafolio oficial.'}
+ else{
+   const sm=metrics(sim.portfolio,{rate:0,infl:0,ig:0,hy:0,usd:0,vix:20});
+   selectedCompare.innerHTML=`<div class="compareGrid">
+   <div class="mini"><span>Retorno</span><b>${m.ret.toFixed(2)}% → ${sm.ret.toFixed(2)}%</b></div>
+   <div class="mini"><span>Volatilidad</span><b>${m.vol.toFixed(2)}% → ${sm.vol.toFixed(2)}%</b></div>
+   <div class="mini"><span>Sharpe</span><b class="${sm.sharpe>=m.sharpe?'good':'bad'}">${m.sharpe.toFixed(2)} → ${sm.sharpe.toFixed(2)}</b></div></div>
+   <p class="note">La simulación ${sm.sharpe>=m.sharpe?'mejora':'reduce'} el Sharpe en ${Math.abs(sm.sharpe-m.sharpe).toFixed(2)}.</p>`;
  }
- document.querySelectorAll('.builderRange,.builderNum').forEach(e=>e.oninput=()=>{assets[+e.dataset.i].proposedWeight=+e.value;renderAll()});
- document.querySelectorAll('.removeBuilder').forEach(e=>e.onclick=()=>{assets.splice(+e.dataset.i,1);renderAll()});
 }
-function normalizeProposed(){const w=normalize(assets.map(a=>a.proposedWeight));assets.forEach((a,i)=>a.proposedWeight=w[i]*100);renderAll()}
-function randomWeights(n,max=.35){let w=Array.from({length:n},()=>-Math.log(Math.random())),s=w.reduce((a,b)=>a+b,0);w=w.map(x=>x/s);for(let t=0;t<7;t++){w=w.map(x=>Math.min(max,x));s=w.reduce((a,b)=>a+b,0);w=w.map(x=>x/s)}return w}
-function optimize(){
- let best=null;
- for(let k=0;k<5000;k++){const w=randomWeights(assets.length,.35),old=assets.map(a=>a.proposedWeight);assets.forEach((a,i)=>a.proposedWeight=w[i]*100);const m=metrics('proposedWeight');if(!best||m.sh>best.m.sh)best={m,w};assets.forEach((a,i)=>a.proposedWeight=old[i])}
- assets.forEach((a,i)=>a.proposedWeight=best.w[i]*100);renderAll();
+function renderSimulationCards(container){
+ if(!simulations.length){container.innerHTML='<div class="note">No hay portafolios simulados guardados.</div>';return}
+ container.innerHTML=simulations.map(s=>{
+  const m=metrics(s.portfolio,{rate:0,infl:0,ig:0,hy:0,usd:0,vix:20});
+  return `<div class="simCard"><h3>${s.name}</h3><div class="meta">${s.created}</div>
+  <div class="metrics"><div><small>Ret.</small><b>${m.ret.toFixed(2)}%</b></div><div><small>Vol.</small><b>${m.vol.toFixed(2)}%</b></div><div><small>Sharpe</small><b>${m.sharpe.toFixed(2)}</b></div></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px">
+  <button class="btn selectSim" data-id="${s.id}">Comparar</button><button class="btn green makeOfficial" data-id="${s.id}">Hacer oficial</button><button class="btn danger deleteSim" data-id="${s.id}">Eliminar</button></div></div>`
+ }).join('');
+ container.querySelectorAll('.selectSim').forEach(b=>b.onclick=()=>{selectedSimulationId=b.dataset.id;renderDashboard()});
+ container.querySelectorAll('.makeOfficial').forEach(b=>b.onclick=()=>makeOfficial(b.dataset.id));
+ container.querySelectorAll('.deleteSim').forEach(b=>b.onclick=()=>{simulations=simulations.filter(s=>s.id!==b.dataset.id);if(selectedSimulationId===b.dataset.id)selectedSimulationId=null;renderAll()});
 }
-function applyChanges(){
- const before=metrics('weight');assets.forEach(a=>a.weight=a.proposedWeight);const after=metrics('weight');
- history.unshift({date:new Date().toLocaleString(),before:before.sh,after:after.sh,weights:assets.map(a=>({ticker:a.ticker,weight:a.weight}))});renderAll();
+function renderMacro(){
+ sensitivityTable.innerHTML=official.map(a=>{
+  const stressed=adjustedReturn(a,macro),impact=stressed-a.expectedReturn;
+  return `<tr><td><b>${a.ticker}</b></td><td>${a.assetClass}</td><td>${a.expectedReturn.toFixed(2)}%</td>
+  <td class="${impact>=0?'deltaPos':'deltaNeg'}">${impact>=0?'+':''}${impact.toFixed(2)} pp</td><td>${stressed.toFixed(2)}%</td><td>${adjustedVol(a,macro).toFixed(2)}%</td></tr>`
+ }).join('');
+ const m=metrics(official,macro),base=metrics(official,{rate:0,infl:0,ig:0,hy:0,usd:0,vix:20});
+ macroSummary.innerHTML=`<div class="compareGrid">
+ <div class="mini"><span>Retorno</span><b>${base.ret.toFixed(2)}% → ${m.ret.toFixed(2)}%</b></div>
+ <div class="mini"><span>Volatilidad</span><b>${base.vol.toFixed(2)}% → ${m.vol.toFixed(2)}%</b></div>
+ <div class="mini"><span>Sharpe</span><b class="${m.sharpe>=base.sharpe?'good':'bad'}">${base.sharpe.toFixed(2)} → ${m.sharpe.toFixed(2)}</b></div></div>`;
 }
-function renderHistory(){
- const html=history.length?history.map(h=>`<div>${h.date}: Sharpe ${h.before.toFixed(2)} → ${h.after.toFixed(2)}</div>`).join(''):'Sin cambios aplicados.';
- historyMini.innerHTML=html;historyFull.innerHTML=html;
+function renderBars(obj){
+ const entries=Object.entries(obj).sort((a,b)=>b[1]-a[1]),max=Math.max(...entries.map(x=>x[1]),1);
+ return entries.map(([k,v])=>`<div class="barRow"><span>${k}</span><div class="barTrack"><i style="width:${v/max*100}%"></i></div><b>${v.toFixed(1)}%</b></div>`).join('');
 }
-function renderScenarios(){
- scenarioList.innerHTML=savedScenarios.length?savedScenarios.map((s,i)=>`<div><button class="btn loadScenario" data-i="${i}">${s.name}</button> · Fed ${s.values.rate} pb · Inflación ${s.values.infl}% · IG ${s.values.ig} pb · HY ${s.values.hy} pb</div>`).join('<br>'):'No hay escenarios guardados.';
- document.querySelectorAll('.loadScenario').forEach(e=>e.onclick=()=>{scenario={...savedScenarios[+e.dataset.i].values};syncScenarioControls();renderAll()});
+function renderExposures(){
+ const m=metrics(official,{rate:0,infl:0,ig:0,hy:0,usd:0,vix:20});renderKPI(riskKPIs,m);
+ assetExposure.innerHTML=renderBars(exposure(official,'assetClass'));
+ regionExposure.innerHTML=renderBars(exposure(official,'region'));
+ themeExposure.innerHTML=renderBars(exposure(official,'theme'));
+ sectorExposure.innerHTML=renderBars(exposure(official,'sector'));
 }
-function syncScenarioControls(){
- rate.value=scenario.rate;infl.value=scenario.infl;ig.value=scenario.ig;hy.value=scenario.hy;usd.value=scenario.usd;vix.value=scenario.vix;
- rateVal.textContent=scenario.rate+' pb';inflVal.textContent=scenario.infl.toFixed(1)+'%';igVal.textContent=scenario.ig+' pb';hyVal.textContent=scenario.hy+' pb';usdVal.textContent=scenario.usd+'%';vixVal.textContent=scenario.vix;
+function randomWeights(n,maxW){
+ let w=Array.from({length:n},()=>-Math.log(Math.random())),s=w.reduce((a,b)=>a+b,0);w=w.map(x=>x/s);
+ for(let t=0;t<8;t++){w=w.map(x=>Math.min(maxW,x));s=w.reduce((a,b)=>a+b,0);w=w.map(x=>x/s)}
+ return w;
 }
-function drawScatter(canvas,points,current,proposed){
- const ctx=canvas.getContext('2d'),d=devicePixelRatio||1,w=canvas.clientWidth,h=canvas.clientHeight;canvas.width=w*d;canvas.height=h*d;ctx.scale(d,d);ctx.fillStyle='#091727';ctx.fillRect(0,0,w,h);
- const xs=points.map(p=>p.v).concat(current.v,proposed.v),ys=points.map(p=>p.r).concat(current.r,proposed.r),xmin=Math.min(...xs)*.85,xmax=Math.max(...xs)*1.1,ymin=Math.min(...ys)-.8,ymax=Math.max(...ys)+.8,p=42;
- const X=x=>p+(x-xmin)/(xmax-xmin)*(w-p*1.4),Y=y=>h-p-(y-ymin)/(ymax-ymin)*(h-p*1.5);
- ctx.strokeStyle='#28405f';for(let k=0;k<5;k++){let yy=p+k*(h-p*1.6)/4;ctx.beginPath();ctx.moveTo(p,yy);ctx.lineTo(w-p/2,yy);ctx.stroke()}
- points.forEach(pt=>{ctx.fillStyle='#2ea8ff44';ctx.beginPath();ctx.arc(X(pt.v),Y(pt.r),2,0,7);ctx.fill()});
- ctx.fillStyle='#35d18a';ctx.beginPath();ctx.arc(X(current.v),Y(current.r),6,0,7);ctx.fill();
- ctx.fillStyle='#f4c34f';ctx.beginPath();ctx.arc(X(proposed.v),Y(proposed.r),6,0,7);ctx.fill();
+function metricFromWeights(base,w,s={rate:0,infl:0,ig:0,hy:0,usd:0,vix:20}){
+ return metrics(base.map((a,i)=>({...a,weight:w[i]*100})),s);
 }
-function drawFrontiers(){
- const pts=[];for(let k=0;k<700;k++){const w=randomWeights(assets.length,.45),old=assets.map(a=>a.proposedWeight);assets.forEach((a,i)=>a.proposedWeight=w[i]*100);pts.push(metrics('proposedWeight'));assets.forEach((a,i)=>a.proposedWeight=old[i])}
- const a=metrics('weight'),p=metrics('proposedWeight');drawScatter(frontier,pts,a,p);drawScatter(frontierLarge,pts,a,p);
+function monteCarlo(base,n,maxW,s){
+ const pts=[];
+ for(let k=0;k<n;k++){const w=randomWeights(base.length,maxW),m=metricFromWeights(base,w,s);pts.push({...m,w})}
+ return pts;
 }
-function drawRisk(){
- const m=metrics('proposedWeight'),c=riskChart,ctx=c.getContext('2d'),d=devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;c.width=w*d;c.height=h*d;ctx.scale(d,d);ctx.fillStyle='#091727';ctx.fillRect(0,0,w,h);
- const rc=m.w.map((wi,i)=>Math.max(0,wi*m.w.reduce((s,wj,j)=>s+wj*corr(assets[i],assets[j])*vol(assets[i])*vol(assets[j]),0))),sum=rc.reduce((a,b)=>a+b,0)||1,vals=rc.map(x=>x/sum*100),max=Math.max(...vals,1),bh=Math.max(12,(h-25)/vals.length-5);
- vals.forEach((n,i)=>{let y=7+i*(bh+5);ctx.fillStyle='#28405f';ctx.fillRect(65,y,w-95,bh);ctx.fillStyle='#2ea8ff';ctx.fillRect(65,y,(w-95)*n/max,bh);ctx.fillStyle='#eef5ff';ctx.font='11px system-ui';ctx.fillText(assets[i].ticker,8,y+bh-2);ctx.fillText(n.toFixed(1)+'%',w-45,y+bh-2)});
+function efficientEnvelope(points){
+ const sorted=[...points].sort((a,b)=>a.vol-b.vol||b.ret-a.ret),bins=40;
+ const minV=Math.min(...sorted.map(p=>p.vol)),maxV=Math.max(...sorted.map(p=>p.vol)),step=(maxV-minV)/bins||1,out=[];
+ for(let i=0;i<=bins;i++){const lo=minV+i*step,hi=lo+step;const cand=sorted.filter(p=>p.vol>=lo&&p.vol<hi);if(cand.length)out.push(cand.reduce((a,b)=>b.ret>a.ret?b:a))}
+ return out.sort((a,b)=>a.vol-b.vol);
 }
-function renderSim(){
- const total=assets.reduce((s,a)=>s+a.proposedWeight,0);simTotal.textContent=total.toFixed(1)+'%';simProgress.style.width=Math.min(total,100)+'%';simTotalStatus.textContent=Math.abs(total-100)<.05?'Suma 100%':'Faltan '+(100-total).toFixed(1)+'%';
- simGroups.innerHTML='';
- for(const [g,list] of Object.entries(groups())){
-   const wrap=document.createElement('div');wrap.className='simGroup';wrap.innerHTML=`<div class="simGroupHead"><span>${g}</span><span>${list.reduce((s,a)=>s+a.proposedWeight,0).toFixed(1)}% · ${list.length} ETFs</span></div>`;
-   list.forEach(a=>{const i=assets.indexOf(a);wrap.innerHTML+=`<div class="simRow"><div><b>${a.ticker}</b><br><span>${a.name}</span></div><input data-i="${i}" class="simRange" type="range" min="0" max="60" step=".5" value="${a.proposedWeight}"><input data-i="${i}" class="simNum" type="number" min="0" max="100" step=".5" value="${a.proposedWeight.toFixed(1)}"><button class="removeSim" data-i="${i}">🗑</button></div>`});
-   simGroups.appendChild(wrap);
+function drawFrontier(){
+ const c=frontierCanvas,ctx=c.getContext('2d'),d=devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;c.width=w*d;c.height=h*d;ctx.scale(d,d);
+ ctx.clearRect(0,0,w,h);ctx.fillStyle='#091727';ctx.fillRect(0,0,w,h);
+ const pts=monteCarlo(official,2500,+maxWeight.value/100,{rate:0,infl:0,ig:0,hy:0,usd:0,vix:20}),env=efficientEnvelope(pts);
+ const officialM=metrics(official,{rate:0,infl:0,ig:0,hy:0,usd:0,vix:20}),simMs=simulations.map(s=>({name:s.name,...metrics(s.portfolio,{rate:0,infl:0,ig:0,hy:0,usd:0,vix:20})}));
+ const xs=pts.map(p=>p.vol).concat(officialM.vol,...simMs.map(x=>x.vol)),ys=pts.map(p=>p.ret).concat(officialM.ret,...simMs.map(x=>x.ret));
+ const xmin=Math.min(...xs)*.9,xmax=Math.max(...xs)*1.08,ymin=Math.min(...ys)-.6,ymax=Math.max(...ys)+.6,pad=52;
+ const X=x=>pad+(x-xmin)/(xmax-xmin)*(w-pad*1.45),Y=y=>h-pad-(y-ymin)/(ymax-ymin)*(h-pad*1.45);
+ ctx.strokeStyle='#28405f';ctx.fillStyle='#8fa4bf';ctx.font='11px system-ui';
+ for(let i=0;i<6;i++){let yy=pad+i*(h-pad*1.5)/5;ctx.beginPath();ctx.moveTo(pad,yy);ctx.lineTo(w-pad/2,yy);ctx.stroke()}
+ for(let i=0;i<6;i++){let xx=pad+i*(w-pad*1.5)/5;ctx.beginPath();ctx.moveTo(xx,pad/2);ctx.lineTo(xx,h-pad);ctx.stroke()}
+ pts.forEach(pt=>{ctx.fillStyle='rgba(46,168,255,.20)';ctx.beginPath();ctx.arc(X(pt.vol),Y(pt.ret),1.8,0,Math.PI*2);ctx.fill()});
+ if(env.length){ctx.strokeStyle='#35d18a';ctx.lineWidth=3;ctx.beginPath();env.forEach((pt,i)=>i?ctx.lineTo(X(pt.vol),Y(pt.ret)):ctx.moveTo(X(pt.vol),Y(pt.ret)));ctx.stroke()}
+ ctx.fillStyle='#f4c34f';ctx.beginPath();ctx.arc(X(officialM.vol),Y(officialM.ret),7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#eef5ff';ctx.fillText('Oficial',X(officialM.vol)+9,Y(officialM.ret)-6);
+ simMs.forEach((sm,i)=>{ctx.fillStyle='#ff6b78';ctx.beginPath();ctx.arc(X(sm.vol),Y(sm.ret),6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#eef5ff';ctx.fillText(sm.name.slice(0,14),X(sm.vol)+8,Y(sm.ret)+12+i%2*10)});
+ ctx.fillStyle='#8fa4bf';ctx.fillText('Volatilidad →',w-95,h-12);ctx.save();ctx.translate(14,95);ctx.rotate(-Math.PI/2);ctx.fillText('Retorno esperado →',0,0);ctx.restore();
+ const best=pts.reduce((a,b)=>b.sharpe>a.sharpe?b:a);
+ frontierCommentary.innerHTML=`La mejor combinación simulada tiene retorno ${best.ret.toFixed(2)}%, volatilidad ${best.vol.toFixed(2)}% y Sharpe ${best.sharpe.toFixed(2)}. La línea verde representa la envolvente eficiente estimada.`;
+}
+function optimizePortfolio(s,model){
+ const maxW=+maxWeight.value/100,target=+targetRet.value,obj=markowitzObjective.value,pts=monteCarlo(official,6000,maxW,s);
+ let best=pts[0];
+ pts.forEach(p=>{
+  let ret=p.ret;
+  if(model==='blacklitterman') ret=.65*p.ret+.35*metrics(official,s).ret;
+  const scoreObj=obj==='sharpe'?(ret-RF)/(p.vol||1):obj==='minvar'?-p.vol:-(Math.abs(ret-target)+p.vol*.02);
+  const bestRet=model==='blacklitterman'?.65*best.ret+.35*metrics(official,s).ret:best.ret;
+  const bestScore=obj==='sharpe'?(bestRet-RF)/(best.vol||1):obj==='minvar'?-best.vol:-(Math.abs(bestRet-target)+best.vol*.02);
+  if(scoreObj>bestScore)best={...p,ret};
+ });
+ return official.map((a,i)=>({...a,weight:best.w[i]*100}));
+}
+function renderSimulationEditor(){
+ const groups={};editingSimulation.forEach((a,i)=>(groups[a.assetClass]??=[]).push({a,i}));
+ simulationEditor.innerHTML='';
+ for(const [g,list] of Object.entries(groups)){
+  const wrap=document.createElement('div');wrap.className='simGroup';
+  wrap.innerHTML=`<div class="simGroupHead"><span>${g}</span><span>${list.reduce((s,x)=>s+x.a.weight,0).toFixed(1)}%</span></div>`;
+  list.forEach(({a,i})=>wrap.innerHTML+=`<div class="simRow"><div><b>${a.ticker}</b><br><span>${a.name}</span></div>
+  <input class="simRange" data-i="${i}" type="range" min="0" max="60" step=".5" value="${a.weight}">
+  <input class="simNum" data-i="${i}" type="number" min="0" max="100" step=".5" value="${a.weight.toFixed(1)}">
+  <button class="btn danger simRemove" data-i="${i}">×</button></div>`);
+  simulationEditor.appendChild(wrap);
  }
- document.querySelectorAll('.simRange,.simNum').forEach(e=>e.oninput=()=>{assets[+e.dataset.i].proposedWeight=+e.value;renderSim();renderAll()});
- document.querySelectorAll('.removeSim').forEach(e=>e.onclick=()=>{assets.splice(+e.dataset.i,1);renderSim();renderAll()});
- const a=groupWeights('weight'),p=groupWeights('proposedWeight');simAllocation.innerHTML='<table><thead><tr><th>Clase</th><th>Actual</th><th>Propuesta</th><th>OW/UW</th></tr></thead><tbody>'+Object.keys({...a,...p}).map(g=>`<tr><td>${g}</td><td>${(a[g]||0).toFixed(1)}%</td><td><b>${(p[g]||0).toFixed(1)}%</b></td><td>${((p[g]||0)-(a[g]||0)).toFixed(1)} pp</td></tr>`).join('')+'</tbody></table>';
- const m=metrics('proposedWeight');simMetrics.innerHTML=`<div class="compare"><div class="mini"><span>Duración</span><b>${m.d.toFixed(2)}</b></div><div class="mini"><span>Yield</span><b>${m.y.toFixed(2)}%</b></div><div class="mini"><span>Sharpe</span><b>${m.sh.toFixed(2)}</b></div></div>`;
+ document.querySelectorAll('.simRange,.simNum').forEach(e=>e.oninput=()=>{editingSimulation[+e.dataset.i].weight=+e.value;renderSimulationEditor();renderSimulationSummary()});
+ document.querySelectorAll('.simRemove').forEach(e=>e.onclick=()=>{editingSimulation.splice(+e.dataset.i,1);renderSimulationEditor();renderSimulationSummary()});
+ renderSimulationSummary();
 }
-function profile(name){
- const presets={
- proteccion:{'Renta Fija Corto Plazo':30,'Renta Fija':35,'TIPS':15,'Crédito IG':10,'Oro':10},
- conservador:{'Renta Fija Corto Plazo':20,'Renta Fija':30,'TIPS':10,'Crédito IG':15,'Renta Variable US':15,'Oro':10},
- balanceado:{'Renta Fija Corto Plazo':10,'Renta Fija':20,'TIPS':10,'Crédito IG':10,'High Yield':5,'Renta Variable US':25,'Renta Variable Internacional':15,'Oro':5},
- agresivo:{'Renta Fija Corto Plazo':5,'Renta Fija':10,'Crédito IG':5,'High Yield':5,'Renta Variable US':40,'Renta Variable Internacional':25,'Oro':10}};
- const target=presets[name];for(const [g,list] of Object.entries(groups())){const tg=target[g]||0;list.forEach(a=>a.proposedWeight=tg/list.length)}renderSim();renderAll();
+function renderSimulationSummary(){
+ const total=editingSimulation.reduce((s,a)=>s+a.weight,0),m=metrics(editingSimulation,{rate:0,infl:0,ig:0,hy:0,usd:0,vix:20}),o=metrics(official,{rate:0,infl:0,ig:0,hy:0,usd:0,vix:20});
+ simTotal.textContent=total.toFixed(1)+'%';simProgress.style.width=Math.min(100,total)+'%';simStatus.textContent=Math.abs(total-100)<.05?'Suma 100%':(total<100?'Faltan ':'Sobran ')+Math.abs(100-total).toFixed(1)+'%';
+ simulationMetrics.innerHTML=`<div class="compareGrid"><div class="mini"><span>Retorno</span><b>${m.ret.toFixed(2)}%</b></div><div class="mini"><span>Volatilidad</span><b>${m.vol.toFixed(2)}%</b></div><div class="mini"><span>Sharpe</span><b>${m.sharpe.toFixed(2)}</b></div></div>`;
+ simulationCompare.innerHTML=`<div class="compareGrid"><div class="mini"><span>Retorno</span><b>${o.ret.toFixed(2)}→${m.ret.toFixed(2)}</b></div><div class="mini"><span>Vol.</span><b>${o.vol.toFixed(2)}→${m.vol.toFixed(2)}</b></div><div class="mini"><span>Sharpe</span><b>${o.sharpe.toFixed(2)}→${m.sharpe.toFixed(2)}</b></div></div>`;
 }
-function renderETFList(query=''){
- const q=query.toLowerCase();etfList.innerHTML='';
- ETF_UNIVERSE.filter(e=>(e.ticker+' '+e.name+' '+e.assetClass).toLowerCase().includes(q)).forEach(e=>{
-   const div=document.createElement('div');div.className='etfItem';div.innerHTML=`<div><b>${e.ticker}</b> · ${e.name}<br><span class="pill">${e.assetClass}</span></div><button class="btn selectETF">Ver</button>`;
-   div.querySelector('button').onclick=()=>selectETF(e);etfList.appendChild(div);
+function openSimulation(){
+ editingSimulation=official.map(a=>({...a}));simulationName.value='Portafolio simulado '+(simulations.length+1);renderSimulationEditor();simulationModal.classList.add('open');
+}
+function saveSimulation(port,name){
+ const normalized=normalizeWeights(port),id='sim-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+ simulations.push({id,name:name||'Simulación',created:new Date().toLocaleString(),portfolio:normalized});
+ selectedSimulationId=id;renderAll();
+}
+function makeOfficial(id){
+ const sim=simulations.find(s=>s.id===id);if(!sim)return;
+ official=sim.portfolio.map(a=>({...a}));window.officialName=sim.name;renderAll();
+}
+function renderETFList(q=''){
+ const s=q.toLowerCase();etfList.innerHTML='';
+ ETF_UNIVERSE.filter(e=>(e.ticker+' '+e.name+' '+e.assetClass+' '+e.region+' '+e.theme+' '+e.sector).toLowerCase().includes(s)).forEach(e=>{
+  const div=document.createElement('div');div.className='etfItem';div.innerHTML=`<div><b>${e.ticker}</b> · ${e.name}<br><span class="pill">${e.assetClass}</span> <span class="pill">${e.region}</span></div><button class="btn light">Ver</button>`;
+  div.querySelector('button').onclick=()=>selectETF(e);etfList.appendChild(div);
  });
 }
 function selectETF(e){
- selectedETF=e;etfDetails.innerHTML=`<h3>${e.ticker} · ${e.name}</h3><p><span class="pill">${e.assetClass}</span></p><table><tr><td>Retorno esperado</td><td>${e.expectedReturn}%</td></tr><tr><td>Volatilidad</td><td>${e.vol}%</td></tr><tr><td>Yield</td><td>${e.yield}%</td></tr><tr><td>Duración</td><td>${e.duration}</td></tr></table><br><button class="btn primary" id="confirmETF">Agregar al portafolio</button>`;$('confirmETF').onclick=()=>{if(!assets.some(a=>a.ticker===e.ticker))assets.push({...e,weight:0,proposedWeight:5,...betas(e)});etfModal.classList.remove('open');renderAll();renderSim()};
+ selectedETF=e;etfDetails.innerHTML=`<h3>${e.ticker} · ${e.name}</h3><p><span class="pill">${e.assetClass}</span> <span class="pill">${e.region}</span> <span class="pill">${e.theme}</span></p>
+ <table><tr><td>Retorno esperado</td><td>${e.expectedReturn}%</td></tr><tr><td>Volatilidad</td><td>${e.vol}%</td></tr><tr><td>Yield</td><td>${e.yield}%</td></tr><tr><td>Duración</td><td>${e.duration}</td></tr></table>
+ <br><button class="btn primary" id="confirmETF">Agregar</button>`;$('confirmETF').onclick=()=>{
+  const item={...e,weight:5,...betas(e)};
+  if(pickerTarget==='official'){if(!official.some(a=>a.ticker===e.ticker))official.push(item)}
+  else{if(!editingSimulation.some(a=>a.ticker===e.ticker))editingSimulation.push(item)}
+  etfModal.classList.remove('open');if(pickerTarget==='official')renderAll();else{renderSimulationEditor()}
+ };
 }
-function saveLocal(){localStorage.setItem('po-v2',JSON.stringify({assets,history,savedScenarios}))}
-function loadLocal(){try{const x=JSON.parse(localStorage.getItem('po-v2'));if(x?.assets?.length){assets=x.assets;history=x.history||[];savedScenarios=x.savedScenarios||[]}}catch{}}
-document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$(b.dataset.view).classList.add('active');drawFrontiers()});
-[['rate','rate',' pb'],['infl','infl','%'],['ig','ig',' pb'],['hy','hy',' pb'],['usd','usd','%'],['vix','vix','']].forEach(([id,key,suf])=>$(id).oninput=e=>{scenario[key]=+e.target.value;$(id+'Val').textContent=(id==='infl'?scenario[key].toFixed(1):scenario[key])+suf;renderAll()});
-resetScen.onclick=()=>{scenario={rate:0,infl:0,ig:0,hy:0,usd:0,vix:20};syncScenarioControls();renderAll()};
-normalizeBtn.onclick=normalizeProposed;optimizeBtn.onclick=optimize;applyBtn.onclick=applyChanges;
-openSimulator.onclick=()=>{renderSim();simModal.classList.add('open')};closeSim.onclick=cancelSim.onclick=()=>simModal.classList.remove('open');saveSim.onclick=()=>{renderAll();simModal.classList.remove('open')};simNormalize.onclick=normalizeProposed;
-document.querySelectorAll('.profileTab[data-profile]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.profileTab[data-profile]').forEach(x=>x.classList.remove('active'));b.classList.add('active');profile(b.dataset.profile)});
-openAdd.onclick=simAddETF.onclick=()=>{renderETFList();etfModal.classList.add('open')};closeETF.onclick=()=>etfModal.classList.remove('open');etfSearch.oninput=e=>renderETFList(e.target.value);
-saveScenarioBtn.onclick=()=>{const name=prompt('Nombre del escenario:','Escenario '+(savedScenarios.length+1));if(name){savedScenarios.push({name,values:{...scenario}});renderAll()}};
-exportBtn.onclick=()=>{const rows=[['Ticker','Nombre','Asset Class','Peso inicial','Peso propuesto','Retorno','Volatilidad','Yield','Duracion'],...assets.map(a=>[a.ticker,a.name,a.assetClass,a.weight.toFixed(2),a.proposedWeight.toFixed(2),ret(a).toFixed(2),vol(a).toFixed(2),a.yield,a.duration])];const blob=new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}),u=URL.createObjectURL(blob),l=document.createElement('a');l.href=u;l.download='portfolio.csv';l.click();URL.revokeObjectURL(u)};
-window.onresize=()=>{drawFrontiers();drawRisk()};
-loadLocal();syncScenarioControls();renderETFList();renderAll();
+function exportCSV(){
+ const rows=[['Ticker','Nombre','Asset Class','Región','Temática','Sector','Peso','Retorno','Volatilidad','Yield','Duración'],
+ ...normalizeWeights(official).map(a=>[a.ticker,a.name,a.assetClass,a.region,a.theme,a.sector,a.weight.toFixed(2),a.expectedReturn,a.vol,a.yield,a.duration])];
+ const blob=new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}),u=URL.createObjectURL(blob),l=document.createElement('a');l.href=u;l.download='portfolio-oficial.csv';l.click();URL.revokeObjectURL(u);
+}
+function saveLocal(){localStorage.setItem('po-v4',JSON.stringify({officialName:window.officialName,official,simulations,selectedSimulationId}))}
+function loadLocal(){try{const x=JSON.parse(localStorage.getItem('po-v4'));if(x?.official?.length){window.officialName=x.officialName||'Portafolio oficial';official=x.official;simulations=x.simulations||[];selectedSimulationId=x.selectedSimulationId||null}}catch{}}
+function renderAll(){renderDashboard();renderMacro();renderExposures();renderSimulationCards(savedSimulations);drawFrontier();saveLocal()}
+function setView(id,title,sub){
+ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$(id).classList.add('active');
+ document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.view===id));pageTitle.textContent=title;pageSubtitle.textContent=sub;
+ if(id==='markowitz')drawFrontier();
+}
+document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>setView(b.dataset.view,b.textContent,b.dataset.view==='dashboard'?'Portafolio oficial y simulaciones guardadas':b.dataset.view==='proposal'?'Sensibilidad macro por instrumento':b.dataset.view==='markowitz'?'Frontera eficiente y propuestas':'Análisis del portafolio'));
+addETFBtn.onclick=()=>{pickerTarget='official';renderETFList();etfModal.classList.add('open')};
+[newSimulationBtn,newSimulationBtn2,newSimulationBtn3].forEach(b=>b.onclick=openSimulation);
+closeSimulation.onclick=cancelSimulation.onclick=()=>simulationModal.classList.remove('open');
+normalizeSimulationBtn.onclick=()=>{editingSimulation=normalizeWeights(editingSimulation);renderSimulationEditor()};
+simulationAddETFBtn.onclick=()=>{pickerTarget='simulation';renderETFList();etfModal.classList.add('open')};
+saveSimulationBtn.onclick=()=>{saveSimulation(editingSimulation,simulationName.value);simulationModal.classList.remove('open')};
+closeETF.onclick=()=>etfModal.classList.remove('open');etfSearch.oninput=e=>renderETFList(e.target.value);
+exportBtn.onclick=exportCSV;
+[['mRate','rate',' pb'],['mInfl','infl','%'],['mIG','ig',' pb'],['mHY','hy',' pb'],['mUSD','usd','%'],['mVIX','vix','']].forEach(([id,key,suf])=>$(id).oninput=e=>{macro[key]=+e.target.value;$(id+'Val').textContent=(id==='mInfl'?macro[key].toFixed(1):macro[key])+suf;renderMacro()});
+resetMacroBtn.onclick=()=>{macro={rate:0,infl:0,ig:0,hy:0,usd:0,vix:20};['mRate','mInfl','mIG','mHY','mUSD','mVIX'].forEach(id=>$(id).value=id==='mVIX'?20:0);mRateVal.textContent='0 pb';mInflVal.textContent='0.0%';mIGVal.textContent='0 pb';mHYVal.textContent='0 pb';mUSDVal.textContent='0%';mVIXVal.textContent='20';renderMacro()};
+macroToSimulationBtn.onclick=()=>{const port=optimizePortfolio(macro,'markowitz');saveSimulation(port,macroPortfolioName.value||'Propuesta macro');setView('dashboard','Dashboard','Portafolio oficial y simulaciones guardadas')};
+maxWeight.oninput=e=>{maxWeightVal.textContent=e.target.value+'%';drawFrontier()};targetRet.oninput=e=>targetRetVal.textContent=(+e.target.value).toFixed(2)+'%';
+createMarkowitzBtn.onclick=()=>{const port=optimizePortfolio({rate:0,infl:0,ig:0,hy:0,usd:0,vix:20},modelType.value);saveSimulation(port,markowitzName.value||'Propuesta');drawFrontier()};
+window.onresize=drawFrontier;
+loadLocal();renderETFList();renderAll();
 </script>
 </body>
 </html>
