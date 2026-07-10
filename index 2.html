@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Portfolio Optimizer Pro</title>
+<style>
+:root{
+  --bg:#08111f;--panel:#0f1b2d;--panel2:#132238;--line:#263853;--text:#eef5ff;
+  --muted:#91a4bf;--accent:#2ea8ff;--green:#32d583;--yellow:#f5c451;--red:#ff6b6b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh;display:grid;grid-template-columns:240px 1fr}
+.sidebar{background:#091523;border-right:1px solid var(--line);padding:18px;position:sticky;top:0;height:100vh}
+.brand{font-size:20px;font-weight:800;letter-spacing:.3px;margin-bottom:4px}
+.subtitle{font-size:12px;color:var(--muted);margin-bottom:22px}
+.navbtn{width:100%;text-align:left;border:0;background:transparent;color:var(--muted);padding:10px 12px;border-radius:9px;margin:4px 0}
+.navbtn.active,.navbtn:hover{background:var(--panel2);color:var(--text)}
+.main{padding:20px;overflow:auto}
+.topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.title h1{font-size:22px;margin:0}.title p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:9px 12px;border-radius:9px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:white;font-weight:700}
+.btn.danger{background:#3b1820;border-color:#73313e}
+.grid-kpi{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.kpi .value{font-size:23px;font-weight:800;margin-top:8px}
+.kpi .delta{font-size:11px;color:var(--green);margin-top:5px}
+.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,.8fr);gap:14px}
+.stack{display:grid;gap:14px}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.section-title h2{font-size:15px;margin:0}.hint{font-size:11px;color:var(--muted)}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:9px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-weight:600;text-align:left}
+td input{width:72px;background:#0b1727;border:1px solid var(--line);color:var(--text);border-radius:7px;padding:6px}
+.tag{display:inline-block;padding:3px 7px;border-radius:999px;background:#19324c;color:#a9d9ff;font-size:10px}
+.weightbar{height:8px;background:#0a1524;border-radius:99px;overflow:hidden;width:90px}
+.weightbar span{display:block;height:100%;background:var(--accent)}
+.chart{width:100%;height:310px}
+.scenario-grid{display:grid;gap:10px}
+.control{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px}
+.control label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
+input[type=range]{width:100%}
+select,.text-input,.num-input{width:100%;background:#0b1727;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px}
+.compare{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.compare .mini{background:var(--panel2);padding:10px;border-radius:9px;border:1px solid var(--line)}
+.mini b{display:block;font-size:18px;margin-top:5px}
+.good{color:var(--green)}.warn{color:var(--yellow)}.bad{color:var(--red)}
+.footer-note{color:var(--muted);font-size:11px;line-height:1.5}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+.modal.open{display:flex}
+.modal-box{width:min(760px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.toast{position:fixed;right:18px;bottom:18px;background:#132238;border:1px solid var(--line);padding:12px 15px;border-radius:10px;display:none;z-index:30}
+.toast.show{display:block}
+@media(max-width:1100px){.grid-kpi{grid-template-columns:repeat(3,1fr)}.layout{grid-template-columns:1fr}.app{grid-template-columns:1fr}.sidebar{display:none}}
+@media(max-width:650px){.grid-kpi{grid-template-columns:repeat(2,1fr)}.compare,.form-grid{grid-template-columns:1fr}.main{padding:12px}.topbar{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">Portfolio Optimizer</div>
+    <div class="subtitle">Proyecto personal · Markowitz</div>
+    <button class="navbtn active">Dashboard</button>
+    <button class="navbtn">Constructor</button>
+    <button class="navbtn">Escenarios</button>
+    <button class="navbtn">Frontera eficiente</button>
+    <button class="navbtn">Historial</button>
+    <div style="margin-top:28px" class="footer-note">
+      Datos teóricos para simulación. No constituye asesoría financiera.
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="title">
+        <h1>Portfolio Construction Workstation</h1>
+        <p>Optimización, escenarios y comparación actual vs propuesto</p>
+      </div>
+      <div class="actions">
+        <button class="btn" id="addBtn">+ Agregar ETF</button>
+        <button class="btn" id="optBtn">Optimizar</button>
+        <button class="btn primary" id="applyBtn">Aplicar cambios</button>
+        <button class="btn" id="exportBtn">Exportar CSV</button>
+      </div>
+    </div>
+
+    <section class="grid-kpi">
+      <div class="card kpi"><div class="label">Retorno esperado</div><div class="value" id="kRet">—</div><div class="delta" id="dRet"></div></div>
+      <div class="card kpi"><div class="label">Volatilidad</div><div class="value" id="kVol">—</div><div class="delta" id="dVol"></div></div>
+      <div class="card kpi"><div class="label">Sharpe</div><div class="value" id="kSharpe">—</div><div class="delta" id="dSharpe"></div></div>
+      <div class="card kpi"><div class="label">Yield</div><div class="value" id="kYield">—</div><div class="delta"></div></div>
+      <div class="card kpi"><div class="label">Duración</div><div class="value" id="kDur">—</div><div class="delta"></div></div>
+      <div class="card kpi"><div class="label">VaR 95% (1a)</div><div class="value" id="kVar">—</div><div class="delta"></div></div>
+    </section>
+
+    <section class="layout">
+      <div class="stack">
+        <div class="card">
+          <div class="section-title"><h2>Portafolio actual y propuesta</h2><span class="hint">Edita pesos; el total se normaliza al calcular</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Ticker</th><th>Clase</th><th>Peso actual</th><th>Peso propuesto</th><th>Ret. esp.</th><th>Vol.</th><th>Yield</th><th>Dur.</th><th>Acción</th></tr></thead>
+              <tbody id="portfolioBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title"><h2>Frontera eficiente</h2><span class="hint">Simulación Monte Carlo con restricciones long-only</span></div>
+          <canvas id="frontier" class="chart"></canvas>
+        </div>
+
+        <div class="card">
+          <div class="section-title"><h2>Contribución al riesgo</h2><span class="hint">Aproximación marginal basada en covarianza</span></div>
+          <canvas id="riskChart" class="chart" style="height:250px"></canvas>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="section-title"><h2>Simulador macro</h2><button class="btn" id="resetScen">Reset</button></div>
+          <div class="scenario-grid">
+            <div class="control"><label><span>Fed / curva</span><b id="fedVal">0 pb</b></label><input id="fed" type="range" min="-500" max="500" step="25" value="0"></div>
+            <div class="control"><label><span>Inflación</span><b id="infVal">0.0%</b></label><input id="infl" type="range" min="-5" max="5" step=".25" value="0"></div>
+            <div class="control"><label><span>Spread IG</span><b id="igVal">0 pb</b></label><input id="ig" type="range" min="0" max="500" step="25" value="0"></div>
+            <div class="control"><label><span>Spread HY</span><b id="hyVal">0 pb</b></label><input id="hy" type="range" min="0" max="500" step="25" value="0"></div>
+            <div class="control"><label><span>USD</span><b id="usdVal">0%</b></label><input id="usd" type="range" min="-20" max="20" step="1" value="0"></div>
+            <div class="control"><label><span>VIX</span><b id="vixVal">20</b></label><input id="vix" type="range" min="10" max="80" step="1" value="20"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title"><h2>Objetivo de optimización</h2></div>
+          <select id="objective">
+            <option value="sharpe">Máximo Sharpe</option>
+            <option value="minvar">Mínima varianza</option>
+            <option value="target">Retorno objetivo</option>
+          </select>
+          <div style="height:9px"></div>
+          <label class="hint">Peso máximo por ETF</label>
+          <input id="maxWeight" type="range" min="10" max="60" step="5" value="35">
+          <div class="hint" style="margin-top:4px">Máximo: <b id="maxWeightVal">35%</b></div>
+          <div style="height:9px"></div>
+          <label class="hint">Retorno objetivo</label>
+          <input id="targetRet" type="range" min="3" max="12" step=".25" value="6">
+          <div class="hint" style="margin-top:4px">Objetivo: <b id="targetRetVal">6.00%</b></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title"><h2>Comparativo</h2></div>
+          <div class="compare">
+            <div class="mini"><span class="hint">Actual Sharpe</span><b id="cSharpeA">—</b></div>
+            <div class="mini"><span class="hint">Propuesto Sharpe</span><b id="cSharpeP">—</b></div>
+            <div class="mini"><span class="hint">Mejora</span><b id="cImprovement">—</b></div>
+          </div>
+          <div style="height:10px"></div>
+          <div id="advisor" class="footer-note"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title"><h2>Historial</h2></div>
+          <div id="history" class="footer-note">Sin cambios aplicados todavía.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="addModal">
+  <div class="modal-box">
+    <div class="section-title"><h2>Agregar ETF al universo</h2><button class="btn" id="closeModal">Cerrar</button></div>
+    <div class="form-grid">
+      <label>Ticker<input id="nTicker" class="text-input" value="TLT"></label>
+      <label>Clase<input id="nClass" class="text-input" value="Treasury largo"></label>
+      <label>Retorno esperado %<input id="nRet" class="num-input" type="number" step=".1" value="5.8"></label>
+      <label>Volatilidad %<input id="nVol" class="num-input" type="number" step=".1" value="14"></label>
+      <label>Yield %<input id="nYield" class="num-input" type="number" step=".1" value="4.5"></label>
+      <label>Duración<input id="nDur" class="num-input" type="number" step=".1" value="16"></label>
+    </div>
+    <div style="height:14px"></div>
+    <button class="btn primary" id="saveEtf">Agregar ETF</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const rf = 4.0;
+let assets = [
+ {ticker:"AGG",cls:"Core Bonds",w:18,pw:18,ret:5.2,vol:5.7,yield:4.6,dur:6.1,betaRate:-0.060,betaInf:0.15,betaIG:-0.15,betaHY:-0.05,betaUSD:0,betaVIX:-0.03},
+ {ticker:"TIP",cls:"TIPS",w:14,pw:14,ret:5.6,vol:6.4,yield:4.2,dur:6.7,betaRate:-0.055,betaInf:0.70,betaIG:-0.05,betaHY:-0.02,betaUSD:0,betaVIX:-0.02},
+ {ticker:"BSV",cls:"Short Treasury",w:14,pw:14,ret:4.7,vol:2.8,yield:4.4,dur:2.7,betaRate:-0.025,betaInf:-0.05,betaIG:-0.03,betaHY:-0.01,betaUSD:0,betaVIX:0},
+ {ticker:"LQD",cls:"IG Credit",w:14,pw:14,ret:6.3,vol:8.2,yield:5.3,dur:8.4,betaRate:-0.070,betaInf:-0.10,betaIG:-0.60,betaHY:-0.15,betaUSD:0,betaVIX:-0.10},
+ {ticker:"HYG",cls:"High Yield",w:8,pw:8,ret:7.5,vol:9.5,yield:7.2,dur:3.2,betaRate:-0.020,betaInf:-0.10,betaIG:-0.15,betaHY:-0.80,betaUSD:0,betaVIX:-0.25},
+ {ticker:"SPY",cls:"US Equity",w:14,pw:14,ret:8.2,vol:16.5,yield:1.2,dur:0,betaRate:-0.010,betaInf:-0.10,betaIG:-0.05,betaHY:-0.10,betaUSD:0.05,betaVIX:-0.65},
+ {ticker:"GLD",cls:"Gold",w:10,pw:10,ret:6.4,vol:15.5,yield:0,dur:0,betaRate:-0.015,betaInf:0.45,betaIG:0,betaHY:0,betaUSD:-0.30,betaVIX:0.18},
+ {ticker:"SHY",cls:"Cash / Bills",w:8,pw:8,ret:4.3,vol:1.7,yield:4.3,dur:1.8,betaRate:-0.015,betaInf:-0.05,betaIG:0,betaHY:0,betaUSD:0,betaVIX:0}
+];
+let history = [];
+let scenario={fed:0,infl:0,ig:0,hy:0,usd:0,vix:20};
+
+const corrBase = (a,b)=>{
+ if(a.ticker===b.ticker) return 1;
+ const c1=a.cls, c2=b.cls;
+ if(c1.includes("Bond")||c1.includes("Treasury")||c1==="TIPS"||c1.includes("Credit")){
+   if(c2.includes("Bond")||c2.includes("Treasury")||c2==="TIPS"||c2.includes("Credit")) return 0.65;
+ }
+ if((c1==="US Equity"&&c2==="High Yield")||(c2==="US Equity"&&c1==="High Yield")) return 0.72;
+ if(c1==="Gold"||c2==="Gold") return 0.08;
+ if(c1==="Cash / Bills"||c2==="Cash / Bills") return 0.15;
+ return 0.25;
+};
+function adjRet(a){
+ const vixShock=(scenario.vix-20);
+ return a.ret + a.betaRate*scenario.fed + a.betaInf*scenario.infl + a.betaIG*(scenario.ig/100) + a.betaHY*(scenario.hy/100) + a.betaUSD*scenario.usd + a.betaVIX*vixShock;
+}
+function adjVol(a){
+ const vixMult = 1 + Math.max(0,scenario.vix-20)/70;
+ const spreadMult = 1 + ((a.cls==="High Yield"?scenario.hy:scenario.ig)/2500);
+ return Math.max(.5,a.vol*vixMult*spreadMult);
+}
+function normalized(which="w"){
+ const vals=assets.map(a=>Math.max(0,+a[which]||0)); const s=vals.reduce((x,y)=>x+y,0)||1;
+ return vals.map(x=>x/s);
+}
+function cov(i,j){
+ const ai=assets[i],aj=assets[j];
+ return corrBase(ai,aj)*(adjVol(ai)/100)*(adjVol(aj)/100);
+}
+function metrics(which="w"){
+ const w=normalized(which);
+ const ret=w.reduce((s,x,i)=>s+x*adjRet(assets[i]),0);
+ let variance=0;
+ for(let i=0;i<w.length;i++)for(let j=0;j<w.length;j++)variance+=w[i]*w[j]*cov(i,j);
+ const vol=Math.sqrt(Math.max(0,variance))*100;
+ const y=w.reduce((s,x,i)=>s+x*assets[i].yield,0);
+ const dur=w.reduce((s,x,i)=>s+x*assets[i].dur,0);
+ const sharpe=(ret-rf)/(vol||1);
+ const var95=Math.max(0,1.645*vol-ret);
+ return {ret,vol,y,dur,sharpe,var95,w};
+}
+function fmt(v,d=2,s="%"){return Number(v).toFixed(d)+s}
+function renderTable(){
+ const body=document.getElementById("portfolioBody"); body.innerHTML="";
+ assets.forEach((a,i)=>{
+  const tr=document.createElement("tr");
+  tr.innerHTML=`<td><b>${a.ticker}</b></td><td><span class="tag">${a.cls}</span></td>
+  <td><div class="weightbar"><span style="width:${Math.min(100,a.w)}%"></span></div> ${a.w.toFixed(1)}%</td>
+  <td><input class="pw" data-i="${i}" type="number" min="0" max="100" step=".5" value="${a.pw.toFixed(1)}"></td>
+  <td>${adjRet(a).toFixed(2)}%</td><td>${adjVol(a).toFixed(2)}%</td><td>${a.yield.toFixed(2)}%</td><td>${a.dur.toFixed(1)}</td>
+  <td><button class="btn danger del" data-i="${i}">Quitar</button></td>`;
+  body.appendChild(tr);
+ });
+ document.querySelectorAll(".pw").forEach(el=>el.addEventListener("input",e=>{assets[+e.target.dataset.i].pw=+e.target.value;renderAll(false)}));
+ document.querySelectorAll(".del").forEach(el=>el.addEventListener("click",e=>{assets.splice(+e.target.dataset.i,1);renderAll()}));
+}
+function drawScatter(canvasId, points, current, proposed){
+ const c=document.getElementById(canvasId),ctx=c.getContext("2d");
+ const dpr=devicePixelRatio||1; const w=c.clientWidth,h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;ctx.scale(dpr,dpr);
+ ctx.clearRect(0,0,w,h);ctx.fillStyle="#0b1727";ctx.fillRect(0,0,w,h);
+ const pad=42; const xs=points.map(p=>p.vol).concat([current.vol,proposed.vol]);const ys=points.map(p=>p.ret).concat([current.ret,proposed.ret]);
+ const xmin=Math.min(...xs)*.85,xmax=Math.max(...xs)*1.1,ymin=Math.min(...ys)-.8,ymax=Math.max(...ys)+.8;
+ const X=x=>pad+(x-xmin)/(xmax-xmin)*(w-pad*1.4),Y=y=>h-pad-(y-ymin)/(ymax-ymin)*(h-pad*1.5);
+ ctx.strokeStyle="#263853";ctx.lineWidth=1;
+ for(let k=0;k<5;k++){let yy=pad+k*(h-pad*1.6)/4;ctx.beginPath();ctx.moveTo(pad,yy);ctx.lineTo(w-pad/2,yy);ctx.stroke()}
+ points.forEach(p=>{ctx.fillStyle="rgba(46,168,255,.22)";ctx.beginPath();ctx.arc(X(p.vol),Y(p.ret),2.2,0,Math.PI*2);ctx.fill()});
+ ctx.fillStyle="#32d583";ctx.beginPath();ctx.arc(X(current.vol),Y(current.ret),6,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle="#f5c451";ctx.beginPath();ctx.arc(X(proposed.vol),Y(proposed.ret),6,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle="#91a4bf";ctx.font="11px system-ui";ctx.fillText("Volatilidad →",w-90,h-10);ctx.save();ctx.translate(12,80);ctx.rotate(-Math.PI/2);ctx.fillText("Retorno esperado →",0,0);ctx.restore();
+ ctx.fillStyle="#32d583";ctx.fillText("Actual",X(current.vol)+8,Y(current.ret)-5);ctx.fillStyle="#f5c451";ctx.fillText("Propuesto",X(proposed.vol)+8,Y(proposed.ret)-5);
+}
+function drawBars(metricsP){
+ const c=document.getElementById("riskChart"),ctx=c.getContext("2d"),dpr=devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;ctx.scale(dpr,dpr);
+ ctx.clearRect(0,0,w,h);ctx.fillStyle="#0b1727";ctx.fillRect(0,0,w,h);
+ const rc=[]; const wts=metricsP.w;
+ for(let i=0;i<wts.length;i++){let m=0;for(let j=0;j<wts.length;j++)m+=wts[j]*cov(i,j);rc.push(Math.max(0,wts[i]*m))}
+ const s=rc.reduce((a,b)=>a+b,0)||1, vals=rc.map(x=>x/s*100); const barH=Math.max(14,(h-35)/vals.length-5);
+ vals.forEach((v,i)=>{const y=8+i*(barH+5);ctx.fillStyle="#263853";ctx.fillRect(75,y,w-100,barH);ctx.fillStyle="#2ea8ff";ctx.fillRect(75,y,(w-100)*v/Math.max(...vals,1),barH);ctx.fillStyle="#eef5ff";ctx.font="11px system-ui";ctx.fillText(assets[i].ticker,8,y+barH-3);ctx.fillText(v.toFixed(1)+"%",w-52,y+barH-3)});
+}
+function randomPortfolios(n=900){
+ const max=+document.getElementById("maxWeight").value/100, pts=[];
+ for(let k=0;k<n;k++){let w=assets.map(()=>-Math.log(Math.random()));let s=w.reduce((a,b)=>a+b,0);w=w.map(x=>x/s);
+  for(let t=0;t<6;t++){w=w.map(x=>Math.min(max,x));s=w.reduce((a,b)=>a+b,0);w=w.map(x=>x/s)}
+  const old=assets.map((a,i)=>a.pw);assets.forEach((a,i)=>a.pw=w[i]*100);const m=metrics("pw");pts.push(m);assets.forEach((a,i)=>a.pw=old[i]);
+ } return pts;
+}
+function optimize(){
+ const pts=randomPortfolios(4500),obj=document.getElementById("objective").value,target=+document.getElementById("targetRet").value;
+ let best=pts[0];
+ pts.forEach(p=>{
+  if(obj==="sharpe"&&p.sharpe>best.sharpe)best=p;
+  if(obj==="minvar"&&p.vol<best.vol)best=p;
+  if(obj==="target"&&Math.abs(p.ret-target)+p.vol*.02<Math.abs(best.ret-target)+best.vol*.02)best=p;
+ });
+ assets.forEach((a,i)=>a.pw=best.w[i]*100);renderAll();toast("Portafolio propuesto optimizado.");
+}
+function renderAll(rebuildTable=true){
+ const a=metrics("w"),p=metrics("pw");
+ if(rebuildTable)renderTable();
+ ["kRet","kVol","kYield","kVar"].forEach(()=>{});
+ document.getElementById("kRet").textContent=fmt(p.ret);document.getElementById("kVol").textContent=fmt(p.vol);
+ document.getElementById("kSharpe").textContent=p.sharpe.toFixed(2);document.getElementById("kYield").textContent=fmt(p.y);
+ document.getElementById("kDur").textContent=p.dur.toFixed(2)+"y";document.getElementById("kVar").textContent=fmt(p.var95);
+ document.getElementById("dRet").textContent=(p.ret-a.ret>=0?"+":"")+fmt(p.ret-a.ret,2," pp");
+ document.getElementById("dVol").textContent=(p.vol-a.vol>=0?"+":"")+fmt(p.vol-a.vol,2," pp");
+ document.getElementById("dSharpe").textContent=(p.sharpe-a.sharpe>=0?"+":"")+(p.sharpe-a.sharpe).toFixed(2);
+ document.getElementById("cSharpeA").textContent=a.sharpe.toFixed(2);document.getElementById("cSharpeP").textContent=p.sharpe.toFixed(2);
+ const imp=p.sharpe-a.sharpe;document.getElementById("cImprovement").textContent=(imp>=0?"+":"")+imp.toFixed(2);
+ document.getElementById("cImprovement").className=imp>=0?"good":"bad";
+ const maxRC=assets[p.w.indexOf(Math.max(...p.w))];
+ document.getElementById("advisor").innerHTML=`<b>Advisor:</b> La propuesta ${imp>=0?"mejora":"reduce"} el Sharpe en ${Math.abs(imp).toFixed(2)}. La mayor posición es <b>${maxRC.ticker}</b>. Duración: ${p.dur.toFixed(2)} años. Bajo el escenario actual, el retorno esperado es ${p.ret.toFixed(2)}%.`;
+ const pts=randomPortfolios(700);drawScatter("frontier",pts,a,p);drawBars(p);
+ localStorage.setItem("portfolio_optimizer_state",JSON.stringify({assets,history}));
+}
+function applyChanges(){
+ const before=metrics("w");assets.forEach(a=>a.w=a.pw);const after=metrics("w");
+ history.unshift({date:new Date().toLocaleString(),before:before.sharpe,after:after.sharpe});
+ document.getElementById("history").innerHTML=history.slice(0,6).map(h=>`${h.date}: Sharpe ${h.before.toFixed(2)} → ${h.after.toFixed(2)}`).join("<br>");
+ renderAll();toast("Cambios aplicados. La propuesta ya es el portafolio actual.");
+}
+function exportCSV(){
+ const rows=[["Ticker","Clase","Peso","Retorno esperado","Volatilidad","Yield","Duracion"],...assets.map(a=>[a.ticker,a.cls,a.w.toFixed(2),adjRet(a).toFixed(2),adjVol(a).toFixed(2),a.yield,a.dur])];
+ const blob=new Blob([rows.map(r=>r.join(",")).join("\n")],{type:"text/csv"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="portfolio.csv";a.click();URL.revokeObjectURL(url);
+}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
+function bindScenario(id,key,fmtFn){
+ const el=document.getElementById(id),val=document.getElementById(id+"Val");
+ el.addEventListener("input",()=>{scenario[key]=+el.value;val.textContent=fmtFn(+el.value);renderAll()});
+}
+bindScenario("fed","fed",v=>v+" pb");bindScenario("infl","infl",v=>v.toFixed(1)+"%");bindScenario("ig","ig",v=>v+" pb");bindScenario("hy","hy",v=>v+" pb");bindScenario("usd","usd",v=>v+"%");bindScenario("vix","vix",v=>v);
+document.getElementById("maxWeight").addEventListener("input",e=>document.getElementById("maxWeightVal").textContent=e.target.value+"%");
+document.getElementById("targetRet").addEventListener("input",e=>document.getElementById("targetRetVal").textContent=(+e.target.value).toFixed(2)+"%");
+document.getElementById("optBtn").addEventListener("click",optimize);document.getElementById("applyBtn").addEventListener("click",applyChanges);document.getElementById("exportBtn").addEventListener("click",exportCSV);
+document.getElementById("addBtn").addEventListener("click",()=>document.getElementById("addModal").classList.add("open"));
+document.getElementById("closeModal").addEventListener("click",()=>document.getElementById("addModal").classList.remove("open"));
+document.getElementById("saveEtf").addEventListener("click",()=>{
+ const t=document.getElementById("nTicker").value.trim().toUpperCase();if(!t)return;
+ assets.push({ticker:t,cls:document.getElementById("nClass").value,w:0,pw:5,ret:+document.getElementById("nRet").value,vol:+document.getElementById("nVol").value,yield:+document.getElementById("nYield").value,dur:+document.getElementById("nDur").value,betaRate:-.03,betaInf:0,betaIG:-.1,betaHY:-.1,betaUSD:0,betaVIX:-.05});
+ document.getElementById("addModal").classList.remove("open");renderAll();toast(t+" agregado al universo.");
+});
+document.getElementById("resetScen").addEventListener("click",()=>{["fed","infl","ig","hy","usd"].forEach(id=>{document.getElementById(id).value=0;document.getElementById(id).dispatchEvent(new Event("input"))});document.getElementById("vix").value=20;document.getElementById("vix").dispatchEvent(new Event("input"))});
+window.addEventListener("resize",()=>renderAll(false));
+try{const saved=JSON.parse(localStorage.getItem("portfolio_optimizer_state"));if(saved?.assets?.length){assets=saved.assets;history=saved.history||[]}}catch(e){}
+if(history.length)document.getElementById("history").innerHTML=history.slice(0,6).map(h=>`${h.date}: Sharpe ${h.before.toFixed(2)} → ${h.after.toFixed(2)}`).join("<br>");
+renderAll();
+</script>
+</body>
+</html>
